@@ -34,6 +34,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "*",
     "cmdk": "^1.1.1",
+    "d3": "^7.9.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.487.0",
@@ -47,15 +48,20 @@
     "sonner": "^2.0.3",
     "tailwind-merge": "*",
     "three": "^0.180.0",
-    "three-mesh-bvh": "^0.8.0",
+    "topojson-client": "^3.1.0",
     "typescript": "^5.9.3",
     "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@types/d3": "^7.4.3",
     "@types/node": "^20.10.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "@types/topojson-client": "^3.1.5",
     "@vitejs/plugin-react-swc": "^3.10.2",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.14",
     "vite": "6.3.5"
   },
   "scripts": {
