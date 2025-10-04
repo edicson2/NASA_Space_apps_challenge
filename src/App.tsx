@@ -6,6 +6,7 @@ import { About } from "./pages/About";
 import { Learn } from "./pages/Learn";
 import { NBL } from "./pages/NBL";
 import { Cupola } from "./pages/Cupola";
+import CupolaViewer from "./pages/CupolaViewer"; // <-- new import
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -42,14 +43,17 @@ export default function App() {
       case "nbl":
         return <NBL />;
       case "cupola":
-        return <Cupola />;
+        // pass navigation handler so Cupola can navigate to the viewer page
+        return <Cupola onNavigate={handleNavigate} />;
+      case "cupola-viewer":
+        return <CupolaViewer onNavigate={handleNavigate} />; // new viewer page
       default:
         return <Home onNavigate={handleNavigate} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="max-h-full min-h-screen bg-background text-foreground">
       <Navigation
         currentPage={currentPage}
         onNavigate={handleNavigate}
