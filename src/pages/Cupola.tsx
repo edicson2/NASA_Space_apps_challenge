@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import {
@@ -15,30 +15,20 @@ import {
   Eye,
   MapPin,
   Camera,
-  Satellite,
   Cloud,
   AlertTriangle,
   Lightbulb,
+  Satellite,
 } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-// Import the local SVG asset for the simulated map grid
-// Place your SVG file at src/assets/grid.svg
-// NOTE: replaced static import with inline data URI to avoid missing-file errors
+import CupolaEarthSimulation from "../components/couplaFiles/CupolaEarthSimulation";
+import CupolaScene from "./CupolaScene";
+import { initCupola } from "../../main";
+
 export function Cupola() {
   const [rotation, setRotation] = useState(0);
   const [zoom, setZoom] = useState(1);
-
-  // Inline SVG grid data URI (small repeating grid). Safe fallback when ../assets/grid.svg is missing.
-  const gridSvgString = `<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'>
-    <rect width='100%' height='100%' fill='transparent'/>
-    <g stroke='rgba(255,255,255,0.06)' stroke-width='0.6'>
-      <path d='M 40 0 L 0 0 0 40' />
-      <path d='M 20 0 L 20 40 M 0 20 L 40 20' stroke='rgba(255,255,255,0.04)' stroke-width='0.5'/>
-    </g>
-  </svg>`;
-  const gridDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(
-    gridSvgString
-  )}`;
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const cupolaFacts = [
     { label: "Windows", value: "7 (6 side + 1 top)" },
@@ -88,6 +78,12 @@ export function Cupola() {
     },
   ];
 
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const instance = initCupola(containerRef.current);
+    return () => instance.dispose();
+  }, []);
+
   return (
     <div className="min-h-screen pt-24 pb-12 px-6">
       <div className="max-w-7xl mx-auto space-y-12">
@@ -133,41 +129,10 @@ export function Cupola() {
                 </div>
               </div>
 
-              {/* 3D Viewer Placeholder */}
-              <div className="relative aspect-square bg-gradient-to-br from-background to-accent rounded-lg overflow-hidden border-2 border-border">
-                <div
-                  className="absolute inset-0 flex items-center justify-center transition-transform duration-500"
-                  style={{
-                    transform: `rotate(${rotation}deg) scale(${zoom})`,
-                  }}
-                >
-                  {/* Simplified Cupola visualization */}
-                  <div className="relative w-64 h-64">
-                    {/* Center window */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-gradient-to-br from-[#0B3D91] to-[#1e5bb8] border-4 border-white/20 shadow-2xl flex items-center justify-center">
-                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 opacity-50" />
-                    </div>
-
-                    {/* Surrounding windows */}
-                    {[0, 60, 120, 180, 240, 300].map((angle, i) => {
-                      const rad = (angle * Math.PI) / 180;
-                      const x = Math.cos(rad) * 100;
-                      const y = Math.sin(rad) * 100;
-                      return (
-                        <div
-                          key={i}
-                          className="absolute w-16 h-20 rounded-lg bg-gradient-to-br from-[#0B3D91]/80 to-[#1e5bb8]/80 border-2 border-white/20 shadow-xl"
-                          style={{
-                            left: `calc(50% + ${x}px)`,
-                            top: `calc(50% + ${y}px)`,
-                            transform: "translate(-50%, -50%)",
-                          }}
-                        >
-                          <div className="w-full h-full bg-gradient-to-br from-blue-400/30 to-blue-600/30 rounded-lg" />
-                        </div>
-                      );
-                    })}
-                  </div>
+              {/* Embedded CupolaScene */}
+              <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-border bg-black">
+                <div className="absolute inset-0">
+                  <CupolaScene />
                 </div>
 
                 <div className="absolute bottom-4 left-4 right-4 bg-background/80 backdrop-blur-sm rounded-lg p-3 text-sm">
@@ -221,20 +186,10 @@ export function Cupola() {
                 <h3 className="text-xl">Current Earth Location</h3>
               </div>
 
-              {/* Simulated map */}
-              <div className="aspect-video bg-gradient-to-br from-blue-500 to-green-500 rounded-lg relative overflow-hidden">
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage: `url("${gridDataUri}")`,
-                    backgroundRepeat: "repeat",
-                    backgroundSize: "auto",
-                  }}
-                />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <Satellite className="h-8 w-8 text-white animate-pulse" />
-                </div>
-                <div className="absolute bottom-2 left-2 right-2 bg-black/50 backdrop-blur-sm rounded px-2 py-1 text-white text-xs">
+              {/* D3 Globe Simulation */}
+              <div className="aspect-video flex items-center justify-center bg-black rounded-lg overflow-hidden relative">
+                <CupolaEarthSimulation />
+                <div className="absolute bottom-2 left-2 right-2 bg-black/50 backdrop-blur-sm rounded px-2 py-1 text-white text-xs text-center">
                   <div>Lat: 25.84° N</div>
                   <div>Lon: -80.27° W</div>
                   <div className="text-white/60">Over: Atlantic Ocean</div>
