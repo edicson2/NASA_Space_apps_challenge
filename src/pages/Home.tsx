@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import nasaGlobe from "../assets/images/nasaGlobe.jpg";
-import andi from "../assets/images/anirudh-unsplash.jpg";
 
 interface HomeProps {
   onNavigate: (page: string) => void;
