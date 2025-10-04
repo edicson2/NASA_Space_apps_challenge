@@ -17,13 +17,12 @@ type GLTFResult = GLTF & {
     astnt1_1: THREE.MeshStandardMaterial;
     astnt1_2: THREE.MeshStandardMaterial;
   };
-  // animations: GLTFAction[];
 };
 
 export function Model(props: JSX.IntrinsicElements["group"]) {
   const { nodes, materials } = useGLTF("/Astronaut.glb") as GLTFResult;
   return (
-    <group {...props} dispose={null as any}>
+    <group {...props} dispose={null}>
       <group rotation={[-Math.PI / 2, 0, 0]}>
         <mesh geometry={nodes["0"].geometry} material={materials.astnt1_1} />
         <mesh geometry={nodes["0_1"].geometry} material={materials.astnt1_2} />
