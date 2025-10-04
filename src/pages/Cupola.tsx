@@ -23,12 +23,15 @@ import {
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import CupolaEarthSimulation from "../components/couplaFiles/CupolaEarthSimulation";
 import CupolaScene from "./CupolaScene";
-import { initCupola } from "../../main";
 
-export function Cupola() {
+export function Cupola({
+  onNavigate,
+}: {
+  onNavigate?: (page: string) => void;
+}) {
   const [rotation, setRotation] = useState(0);
   const [zoom, setZoom] = useState(1);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  // containerRef and initCupola not needed here anymore
 
   const cupolaFacts = [
     { label: "Windows", value: "7 (6 side + 1 top)" },
@@ -78,12 +81,6 @@ export function Cupola() {
     },
   ];
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const instance = initCupola(containerRef.current);
-    return () => instance.dispose();
-  }, []);
-
   return (
     <div className="min-h-screen pt-24 pb-12 px-6">
       <div className="max-w-7xl mx-auto space-y-12">
@@ -112,6 +109,14 @@ export function Cupola() {
                     <RotateCw className="h-4 w-4 mr-1" />
                     Rotate
                   </Button>
+                  {/* Open the full interactive viewer (new page) */}
+                  <Button
+                    size="sm"
+                    className="bg-[#0B3D91] text-white"
+                    onClick={() => onNavigate && onNavigate("cupola-viewer")}
+                  >
+                    Open Interactive 3D
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
@@ -129,7 +134,7 @@ export function Cupola() {
                 </div>
               </div>
 
-              {/* Embedded CupolaScene */}
+              {/* Small preview of the scene (keep CupolaScene preview) */}
               <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-border bg-black">
                 <div className="absolute inset-0">
                   <CupolaScene />
