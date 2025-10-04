@@ -1,34 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>NASA ISS</title>
 
-    <link rel="stylesheet" href="public/index.css" />
-    <!-- <link rel="stylesheet" href="/button/button.css" /> -->
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Futuristic Landing Page UI</title>
+    </head>
 
-    <script
-      async
-      src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"
-    ></script>
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@v0.163.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@v0.163.0/examples/jsm/"
-        }
-      }
-    </script>
-  </head>
-  <body>
-    <div id="heading">
-      <h1>CUPOLA</h1>
-      <div class="border"></div>
-    </div>
-    <div id="progress-container">
-      <div id="progress">LOADING...</div>
-    </div>
-
-    <script type="module" src="./main.js"></script>
-  </body>
-</html>
+    <body>
+      <div id="root"></div>
+      <script type="module" src="/src/main.tsx"></script>
+    </body>
+  </html>
+  
