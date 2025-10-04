@@ -3,7 +3,6 @@
 // This prevents errors like: "Cannot find module or type declarations for side-effect import of './index.css'"
 
 declare module "*.jpg";
-declare module "*.png";
 declare module "*.svg";
 
 declare module "*.css";
