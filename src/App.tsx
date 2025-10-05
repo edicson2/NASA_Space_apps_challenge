@@ -5,8 +5,8 @@ import { About } from "./pages/About";
 import { Learn } from "./pages/Learn";
 import { NBL } from "./pages/NBL";
 import { Cupola } from "./pages/Cupola";
-import CupolaViewer from "./pages/CupolaViewer"; // <-- new import
 import { Home } from "./pages/Home";
+// import CupolaViewer from "../src/pages/CupolaViewer";
 // import Home from "./pages/Home";
 
 export default function App() {
@@ -49,7 +49,7 @@ export default function App() {
       case "cupola-viewer":
         return (
           <div className="h-screen w-screen">
-            <CupolaViewer onNavigate={handleNavigate} />
+            {/* <CupolaViewer onNavigate={handleNavigate} /> */}
           </div>
         ); // new viewer page
       default:
