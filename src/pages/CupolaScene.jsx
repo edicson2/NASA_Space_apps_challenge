@@ -64,7 +64,7 @@ function StarfieldBackground() {
       uniforms,
       side: THREE.BackSide,
       depthWrite: false,
-      transparent: true, // ✅ blend stars
+      transparent: true, // ✅ keep stars blending
     });
   }, []);
 
@@ -84,10 +84,10 @@ function StarfieldBackground() {
 /** ---------------------------
  * Cupola Model (GLB)
  * --------------------------- */
-const CupolaModel = ({ onMeshesLoaded }) => {
+const CupolaModel = () => {
   const group = useRef(null);
 
-  // changed: use Vite base URL so asset is found when app is served under a subpath
+  // ✅ Vite-safe path
   const gltfPath = `${import.meta.env.BASE_URL}cupola_2/scene.glb`;
   const { scene } = useGLTF(gltfPath);
 
@@ -134,9 +134,7 @@ const CupolaModel = ({ onMeshesLoaded }) => {
       }
 
       modelClone.rotation.x = Math.PI;
-
-      // 🔽 Apply a 10% reduction in size
-      modelClone.scale.setScalar(0.9); // reduces Cupola size by 10%
+      modelClone.scale.setScalar(0.9); // 🔽 10% smaller Cupola
 
       group.current.add(modelClone);
     }
@@ -167,13 +165,22 @@ function Lights() {
 /** ---------------------------
  * Earth
  * --------------------------- */
+/** ---------------------------
+ * Earth
+ * --------------------------- */
 function Earth({ onHover }) {
   const earthTex = useMemo(
-    () => new THREE.TextureLoader().load("/maps/Earth-1440x720.jpg"),
+    () =>
+      new THREE.TextureLoader().load(
+        `${import.meta.env.BASE_URL}maps/Earth-1440x720.jpg`
+      ),
     []
   );
   const cloudsTex = useMemo(
-    () => new THREE.TextureLoader().load("/maps/flat_earth_still_clouds.jpg"),
+    () =>
+      new THREE.TextureLoader().load(
+        `${import.meta.env.BASE_URL}maps/flat_earth_still_clouds.jpg`
+      ),
     []
   );
 
@@ -199,7 +206,7 @@ function Earth({ onHover }) {
 
       raycaster.setFromCamera(mouse, camera);
       if (earthRef.current) {
-        earthRef.current.updateMatrixWorld(true); // ✅ precision fix
+        earthRef.current.updateMatrixWorld(true);
         const intersects = raycaster.intersectObject(earthRef.current, true);
         if (intersects.length > 0) {
           const p = intersects[0].point
@@ -243,7 +250,6 @@ function Earth({ onHover }) {
     </>
   );
 }
-
 /** ---------------------------
  * Tooltip
  * --------------------------- */
@@ -326,4 +332,5 @@ export default function CupolaScene() {
   );
 }
 
-useGLTF.preload("/cupola_2/scene.glb");
+// ✅ Preload with Vite-safe path
+useGLTF.preload(`${import.meta.env.BASE_URL}cupola_2/scene.glb`);
