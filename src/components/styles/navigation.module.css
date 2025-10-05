@@ -1,0 +1,219 @@
+/* Container positioning */
+.collapsedMenu {
+  position: fixed;
+  top: 1.5rem; /* 6 */
+  left: 1.5rem;
+  z-index: 100;
+  transition: all 0.5s ease-out;
+}
+.collapsedMenu.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0) translateX(-1rem);
+}
+.collapsedMenu.visible {
+  opacity: 1;
+  transform: scale(1) translateX(0);
+}
+
+/* Menu button */
+.menuButton {
+  width: 4rem; /* 16 */
+  height: 4rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.05)
+  );
+  backdrop-filter: blur(12px) saturate(150%);
+  transition: all 0.3s;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+.menuButton:hover {
+  transform: scale(1.1) rotate(90deg);
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.1)
+  );
+}
+.menuButton:active {
+  transform: scale(0.95);
+}
+
+/* Expanded nav */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  transition: all 0.7s ease-out;
+}
+.navbar.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.navbar.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Glass layers */
+.navBackground {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.05)
+  );
+}
+.navBackground.dark {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2),
+    rgba(0, 0, 0, 0.1)
+  );
+}
+.backdropLayer {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(20px) saturate(150%);
+}
+.borderLayer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+}
+.shadowLayer {
+  position: absolute;
+  inset: 0;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+}
+
+/* Content container */
+.navContent {
+  position: relative;
+  max-width: 80rem; /* 7xl */
+  margin: 0 auto;
+  padding: 1rem 1.5rem; /* py-4 px-6 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logoButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s;
+}
+.logoButton:hover {
+  opacity: 0.8;
+}
+.logoIcon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #0b3d91, #0a2d6e);
+  box-shadow: 0 10px 15px rgba(11, 61, 145, 0.3);
+  transition: all 0.3s;
+}
+.logoIcon:hover {
+  transform: scale(1.1) rotate(12deg);
+}
+.logoText {
+  font-weight: bold;
+  color: var(--foreground);
+  letter-spacing: -0.025em;
+}
+
+/* Desktop nav links */
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.navLink {
+  padding: 0.625rem 1rem; /* py-2.5 px-4 */
+  border-radius: 0.75rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s;
+}
+.navLink.active {
+  background: linear-gradient(to right, #0b3d91, #0a2d6e);
+  color: white;
+  box-shadow: 0 10px 15px rgba(11, 61, 145, 0.3);
+  transform: scale(1.05);
+}
+.navLink.inactive {
+  color: var(--foreground);
+}
+.navLink.inactive:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+/* Right controls */
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.themeButton {
+  border-radius: 9999px;
+  transition: all 0.3s;
+  backdrop-filter: blur(4px);
+}
+.themeButton:hover {
+  transform: scale(1.1) rotate(180deg);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Mobile links */
+.mobileLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0 1.5rem 1rem;
+}
+.mobileLink {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s;
+}
+.mobileLink.active {
+  background: linear-gradient(to right, #0b3d91, #0a2d6e);
+  color: white;
+  box-shadow: 0 10px 15px rgba(11, 61, 145, 0.3);
+}
+.mobileLink.inactive {
+  color: var(--foreground);
+}
+.mobileLink.inactive:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
