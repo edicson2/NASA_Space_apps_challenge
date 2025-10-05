@@ -19,3 +19,7 @@ declare module "*.webp";
 declare module "*.avif";
 
 declare module "*.svg";
+declare module "*.glb" {
+  const value: string;
+  export default value;
+}

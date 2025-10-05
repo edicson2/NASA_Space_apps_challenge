@@ -21,7 +21,6 @@ export function NBL() {
       });
     }
   };
-
   const comparisons = [
     {
       aspect: "Pressure",
