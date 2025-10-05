@@ -396,7 +396,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ info, onClose }) => {
     <div
       style={{
         position: "fixed",
-        top: "100px",
+        bottom: "20px",
         right: "20px",
         background: "rgba(0, 0, 0, 0.9)",
         border: "2px solid #06b6d4",
@@ -474,7 +474,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ info, onClose }) => {
   );
 };
 
-// Quick fact
+// Quick Facts Panel Component
 interface QuickFactsPanelProps {
   onClose: () => void;
 }
@@ -484,7 +484,7 @@ const QuickFactsPanel: React.FC<QuickFactsPanelProps> = ({ onClose }) => {
     <div
       style={{
         position: "fixed",
-        bottom: "20px",
+        top: "100px",
         right: "20px",
         background: "rgba(0, 0, 0, 0.95)",
         border: "2px solid #10b981",
@@ -597,6 +597,7 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
   const [fpMode, setFpMode] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showQuickFacts, setShowQuickFacts] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -637,8 +638,23 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
       audioRef.current.play().catch((error) => {
         console.log("Audio autoplay blocked:", error);
       });
+      setIsAudioPlaying(true);
     }
   }, []);
+
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (isAudioPlaying) {
+        audioRef.current.pause();
+        setIsAudioPlaying(false);
+      } else {
+        audioRef.current.play().catch((error) => {
+          console.log("Audio play failed:", error);
+        });
+        setIsAudioPlaying(true);
+      }
+    }
+  };
 
   return (
     <div
@@ -717,7 +733,7 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
         <InstructionsPanel onHide={() => setShowInstructions(false)} />
       ) : (
         <button
-          onClick={() => setShowInstructions(!showInstructions)}
+          onClick={() => setShowInstructions(true)}
           style={{
             position: "fixed",
             top: "100px",
@@ -749,13 +765,50 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
         </button>
       )}
 
+      <button
+        onClick={toggleAudio}
+        style={{
+          position: "fixed",
+          top: showInstructions ? "520px" : "160px",
+          left: "20px",
+          background: "rgba(0, 0, 0, 0.9)",
+          border: "2px solid #10b981",
+          color: "#10b981",
+          width: "45px",
+          height: "45px",
+          borderRadius: "50%",
+          cursor: "pointer",
+          fontSize: "18px",
+          fontFamily: "monospace",
+          zIndex: 100,
+          transition: "all 0.3s ease",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(16, 185, 129, 0.2)";
+          e.currentTarget.style.transform = "scale(1.05)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(0, 0, 0, 0.9)";
+          e.currentTarget.style.transform = "scale(1)";
+        }}
+      >
+        {isAudioPlaying ? "🔊" : "🔇"}
+      </button>
+
       <InfoPanel info={info} onClose={() => setInfo(null)} />
+
+      {showQuickFacts && (
+        <QuickFactsPanel onClose={() => setShowQuickFacts(false)} />
+      )}
 
       <button
         onClick={() => setShowQuickFacts(!showQuickFacts)}
         style={{
           position: "fixed",
-          bottom: "20px",
+          top: "100px",
           right: "20px",
           background: "rgba(0, 0, 0, 0.9)",
           border: "2px solid #10b981",
@@ -784,17 +837,6 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
         <span>🔬</span>
         <span>QUICK FACTS</span>
       </button>
-
-      <audio
-        ref={audioRef}
-        src="/public/cupola_2/cupola.mp3"
-        loop
-        preload="auto"
-      />
-
-      {showQuickFacts && (
-        <QuickFactsPanel onClose={() => setShowQuickFacts(true)} />
-      )}
 
       <audio
         ref={audioRef}
