@@ -27,8 +27,8 @@ export function Navigation({
     { name: "Home", id: "home" },
     { name: "Cupola", id: "cupola" },
     { name: "NBL", id: "nbl" },
-    { name: "Learn", id: "learn" },
-    { name: "About", id: "about" },
+    // { name: "Learn", id: "learn" },
+    // { name: "About", id: "about" },
   ];
 
   // Idle hide logic
@@ -108,17 +108,16 @@ export function Navigation({
               {/* Logo */}
               <button
                 onClick={() => onNavigate("home")}
-                className={styles.logoButton}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
-                <div className={styles.logoIcon}>
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                      fill="white"
-                    />
-                  </svg>
-                </div>
-                <span className={styles.logoText}>Window to the World</span>
+                <img
+                  src="/nasa/NASA_logo.png"
+                  alt="NASA Logo"
+                  className="w-10 h-10 object-cover rounded-full"
+                />
+                <span className={styles.logoText}>
+                  Team Alpha Super Awesome Cool Dynamite Wolf Squadron
+                </span>
               </button>
 
               {/* Desktop Links (only show on desktop) */}
@@ -141,7 +140,7 @@ export function Navigation({
               )}
 
               {/* Right Controls */}
-              <div className={styles.rightControls}>
+              {/* <div className={styles.rightControls}>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -155,7 +154,7 @@ export function Navigation({
                   )}
                 </Button>
                 <ISSTracker />
-              </div>
+              </div> */}
             </div>
 
             {/* Mobile Links (only show on mobile) */}
