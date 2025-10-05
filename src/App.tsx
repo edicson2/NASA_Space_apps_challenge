@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
-import { Home } from "./pages/Home";
 import { About } from "./pages/About";
 import { Learn } from "./pages/Learn";
 import { NBL } from "./pages/NBL";
 import { Cupola } from "./pages/Cupola";
 import CupolaViewer from "./pages/CupolaViewer"; // <-- new import
+import { Home } from "./pages/Home";
+// import Home from "./pages/Home";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("home");

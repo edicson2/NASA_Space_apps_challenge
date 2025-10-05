@@ -32,7 +32,7 @@ export default function CupolaViewer({
       {/* <main className="flex-1 relative overflow-hidden min-h-0">
         <CupolaScene />
       </main> */}
-      <div className="">
+      <div className="absolute inset-0">
         <CupolaScene />
       </div>
       {/* Footer */}
