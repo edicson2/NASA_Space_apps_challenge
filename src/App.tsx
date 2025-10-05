@@ -46,7 +46,11 @@ export default function App() {
         // pass navigation handler so Cupola can navigate to the viewer page
         return <Cupola onNavigate={handleNavigate} />;
       case "cupola-viewer":
-        return <CupolaViewer onNavigate={handleNavigate} />; // new viewer page
+        return (
+          <div className="h-screen w-screen">
+            <CupolaViewer onNavigate={handleNavigate} />
+          </div>
+        ); // new viewer page
       default:
         return <Home onNavigate={handleNavigate} />;
     }
