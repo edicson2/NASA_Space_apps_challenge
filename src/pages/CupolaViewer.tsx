@@ -9,7 +9,7 @@ export default function CupolaViewer({
   onNavigate?: (page: string) => void;
 }) {
   return (
-    <div className="flex flex-col h-screen bg-black bg-[#FF0000]">
+    <div className="flex flex-col h-full w-full bg-black">
       {/* Header */}
       <header className="flex-shrink-0 px-6 py-4 border-b border-border bg-background">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -28,11 +28,13 @@ export default function CupolaViewer({
         </div>
       </header>
 
-      {/* Main 3D Scene - This will fill remaining space */}
-      <main className="flex-1 relative h-full bg-[#FF0000] overflow-hidden">
+      {/* Main 3D Scene - fills remaining space */}
+      {/* <main className="flex-1 relative overflow-hidden min-h-0">
         <CupolaScene />
-      </main>
-
+      </main> */}
+      <div className="">
+        <CupolaScene />
+      </div>
       {/* Footer */}
       <footer className="flex-shrink-0 px-6 py-3 border-t border-border bg-background">
         <div className="max-w-7xl mx-auto">
