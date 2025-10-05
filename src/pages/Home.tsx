@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import spaceWhite from "../assets/images/spacwWhite.jpg";
 import RotatingGlobe from "../components/RotatingGlobe";
-import SplashCursor from "../components/SplashCursor";
 
 interface HomeProps {
   onNavigate: (page: string) => void;
@@ -23,10 +22,8 @@ export function Home({ onNavigate }: HomeProps) {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#FF0000]">
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#0a1128]">
       {/* Background with parallax effect */}
-      {/* #0a1128 */}
-      <SplashCursor />
       <div
         className="absolute inset-0 transition-transform duration-300 ease-out"
         style={{

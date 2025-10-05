@@ -1,112 +1,3 @@
-// import React, { useEffect, useRef } from "react";
-
-// type GlobeProps = {
-//   src: string; // globe image path (jpg/png)
-//   width?: number; // CSS width or undefined to be responsive
-//   height?: number;
-//   pointerInfluence?: number; // how strongly mouse moves affect rotation
-//   autoSpeed?: number; // slow automatic spin (deg/sec)
-// };
-
-// export default function Globe({
-//   src,
-//   width = undefined,
-//   height = undefined,
-//   pointerInfluence = 0.08,
-//   autoSpeed = 2 / 60, // degrees per frame ~ very slow
-// }: GlobeProps) {
-//   const containerRef = useRef<HTMLDivElement | null>(null);
-//   const imgRef = useRef<HTMLImageElement | null>(null);
-
-//   // rotation state (in degrees)
-//   const rotRef = useRef({ x: 0, y: 0, vx: 0, vy: 0 });
-
-//   useEffect(() => {
-//     let raf = 0;
-//     let last = performance.now();
-//     let mouseX = 0;
-//     let mouseY = 0;
-//     const rect = () => containerRef.current?.getBoundingClientRect();
-
-//     const onMove = (e: MouseEvent) => {
-//       const r = rect();
-//       if (!r) return;
-//       // normalized -0.5..0.5
-//       mouseX = (e.clientX - (r.left + r.width / 2)) / r.width;
-//       mouseY = (e.clientY - (r.top + r.height / 2)) / r.height;
-//     };
-
-//     window.addEventListener("mousemove", onMove);
-
-//     const loop = (now: number) => {
-//       const dt = Math.min(32, now - last) / 1000;
-//       last = now;
-
-//       // pointer target velocities (degrees per second)
-//       const targetVy = mouseX * 60 * pointerInfluence; // yaw (y axis)
-//       const targetVx = -mouseY * 30 * pointerInfluence; // pitch (x axis)
-
-//       // simple damping to smooth turning
-//       rotRef.current.vy += (targetVy - rotRef.current.vy) * 0.08;
-//       rotRef.current.vx += (targetVx - rotRef.current.vx) * 0.08;
-
-//       // add auto spin (small)
-//       rotRef.current.vy += autoSpeed * 360 * dt; // autoSpeed is in revolutions/sec fraction
-
-//       // integrate
-//       rotRef.current.y += rotRef.current.vy * dt;
-//       rotRef.current.x += rotRef.current.vx * dt;
-
-//       // clamp x (pitch) so it doesn't flip
-//       rotRef.current.x = Math.max(-30, Math.min(30, rotRef.current.x));
-
-//       if (imgRef.current) {
-//         imgRef.current.style.transform = `rotateX(${rotRef.current.x}deg) rotateZ(${rotRef.current.y}deg)`;
-//       }
-
-//       raf = requestAnimationFrame(loop);
-//     };
-//     raf = requestAnimationFrame(loop);
-
-//     return () => {
-//       cancelAnimationFrame(raf);
-//       window.removeEventListener("mousemove", onMove);
-//     };
-//   }, [pointerInfluence, autoSpeed]);
-
-//   return (
-//     <div
-//       ref={containerRef}
-//       style={{
-//         width: width ?? "100%",
-//         height: height ?? "100%",
-//         display: "flex",
-//         alignItems: "center",
-//         justifyContent: "center",
-//         perspective: 900,
-//         overflow: "hidden",
-//       }}
-//     >
-//       <img
-//         ref={imgRef}
-//         src={src}
-//         alt="Globe"
-//         draggable={false}
-//         style={{
-//           width: "70%", // tune: 70% of container width; adjust if you want bigger
-//           maxWidth: 900,
-//           height: "auto",
-//           transformStyle: "preserve-3d",
-//           transition: "filter 200ms ease",
-//           willChange: "transform",
-//           userSelect: "none",
-//           pointerEvents: "none",
-//         }}
-//       />
-//     </div>
-//   );
-// }
-
 import { useState, useEffect, useRef } from "react";
 import nasaGlobe from "../assets/images/nasaGlobe.jpg";
 
@@ -208,11 +99,6 @@ function Globe({
   );
 }
 
-// SplashCursor Component (placeholder)
-function SplashCursor() {
-  return null;
-}
-
 // Button Component (placeholder)
 function Button({
   children,
@@ -252,8 +138,6 @@ export default function Home({ onNavigate }: HomeProps) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#0a1128]">
-      <SplashCursor />
-
       {/* Background with parallax effect */}
       <div
         className="absolute inset-0 transition-transform duration-300 ease-out"
