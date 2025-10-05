@@ -84,64 +84,66 @@ function StarfieldBackground() {
 /** ---------------------------
  * Cupola Model (GLB)
  * --------------------------- */
-function CupolaModel() {
-  const groupRef = useRef();
-  const { scene } = useGLTF("/cupola_2/scene.glb");
+const CupolaModel = ({ onMeshesLoaded }) => {
+  const group = useRef(null);
+
+  // changed: use Vite base URL so asset is found when app is served under a subpath
+  const gltfPath = `${import.meta.env.BASE_URL}cupola_2/scene.glb`;
+  const { scene } = useGLTF(gltfPath);
 
   useEffect(() => {
-    if (!scene || !groupRef.current) return;
-    const modelClone = scene.clone(true);
+    if (scene && group.current) {
+      const modelClone = scene.clone(true);
 
-    modelClone.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-        const mat = (
-          child.material || new THREE.MeshStandardMaterial()
-        ).clone();
-        mat.side = THREE.DoubleSide;
-        mat.transparent = true;
+      modelClone.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          const mat = (
+            child.material || new THREE.MeshStandardMaterial()
+          ).clone();
+          mat.side = THREE.DoubleSide;
+          mat.transparent = true;
 
-        const nm = (child.name || "").toLowerCase();
-        const mm = (mat.name || "").toLowerCase();
-        const looksLikeGlass =
-          nm.includes("glass") ||
-          nm.includes("window") ||
-          mm.includes("glass") ||
-          mm.includes("window");
+          const nm = (child.name || "").toLowerCase();
+          const mm = (mat.name || "").toLowerCase();
+          const looksLikeGlass =
+            nm.includes("glass") ||
+            nm.includes("window") ||
+            mm.includes("glass") ||
+            mm.includes("window");
 
-        if (looksLikeGlass) {
-          mat.opacity = 0.25;
-          mat.depthWrite = false;
-          mat.ior = 1.2;
-          mat.metalness = 0.0;
-          mat.roughness = 0.1;
-        } else {
-          mat.opacity = 1.0;
-          mat.metalness = 0.1;
-          mat.roughness = 0.7;
+          if (looksLikeGlass) {
+            mat.opacity = 0.25;
+            mat.depthWrite = false;
+            mat.ior = 1.2;
+            mat.metalness = 0.0;
+            mat.roughness = 0.1;
+          } else {
+            mat.opacity = 1.0;
+            mat.metalness = 0.1;
+            mat.roughness = 0.7;
+          }
+          child.material = mat;
         }
-        child.material = mat;
+      });
+
+      // Clear old model and add new one
+      while (group.current.children.length > 0) {
+        group.current.remove(group.current.children[0]);
       }
-    });
 
-    // Clear old model and add new one
-    while (groupRef.current.children.length > 0) {
-      groupRef.current.remove(groupRef.current.children[0]);
+      modelClone.rotation.x = Math.PI;
+
+      // 🔽 Apply a 10% reduction in size
+      modelClone.scale.setScalar(0.9); // reduces Cupola size by 10%
+
+      group.current.add(modelClone);
     }
-
-    modelClone.rotation.x = Math.PI;
-
-    // 🔽 Apply a 10% reduction in size
-    modelClone.scale.setScalar(0.9); // reduces Cupola size by 10%
-
-    groupRef.current.add(modelClone);
   }, [scene]);
 
-  return (
-    <primitive object={groupRef.current ?? new THREE.Group()} ref={groupRef} />
-  );
-}
+  return <group ref={group} />;
+};
 
 /** ---------------------------
  * Lights
