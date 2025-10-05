@@ -41,27 +41,22 @@ const CupolaModel: React.FC<CupolaModelProps> = ({ onMeshesLoaded }) => {
   useEffect(() => {
     if (!scene || !groupRef.current) return;
 
-    // Clone the scene
     const modelClone = scene.clone(true);
 
-    // Traverse and setup materials for transparency
     modelClone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
 
-        // Make materials transparent
         if (mesh.material) {
           const material = mesh.material as THREE.MeshStandardMaterial;
           const materialName = material.name ? material.name.toLowerCase() : "";
           const meshName = mesh.name ? mesh.name.toLowerCase() : "";
 
-          // Clone material to avoid affecting other instances
           mesh.material = material.clone();
           const mat = mesh.material as THREE.MeshStandardMaterial;
 
-          // If it's glass/window, make it very transparent
           if (
             materialName.includes("glass") ||
             materialName.includes("window") ||
@@ -73,52 +68,40 @@ const CupolaModel: React.FC<CupolaModelProps> = ({ onMeshesLoaded }) => {
             mat.side = THREE.DoubleSide;
             mat.depthWrite = false;
           } else {
-            // For other parts, less transparent
             mat.transparent = true;
             mat.opacity = 0.85;
             mat.side = THREE.DoubleSide;
             mat.depthWrite = false;
           }
-
-          console.log("Material:", materialName, "Mesh:", meshName);
         }
       }
     });
 
-    // Calculate bounding box to center and scale properly
     const box = new THREE.Box3().setFromObject(modelClone);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
 
-    // Get the largest dimension
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
-
-    // Scale to fit nicely in view
     const targetSize = 5;
     const scale = targetSize / maxDim;
     modelClone.scale.setScalar(scale);
 
-    // Rotate 180 degrees vertically (around X axis) BEFORE positioning
     modelClone.rotation.x = Math.PI;
 
-    // Recalculate bounding box after rotation
     const rotatedBox = new THREE.Box3().setFromObject(modelClone);
     const rotatedCenter = rotatedBox.getCenter(new THREE.Vector3());
 
-    // Center the model based on rotated position
     modelClone.position.set(
       -rotatedCenter.x,
       -rotatedCenter.y + 1.05,
       -rotatedCenter.z
     );
 
-    // Clear and add to group
     while (groupRef.current.children.length > 0) {
       groupRef.current.remove(groupRef.current.children[0]);
     }
     groupRef.current.add(modelClone);
 
-    // Collect clickable meshes
     const meshes: THREE.Mesh[] = [];
     modelClone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
@@ -129,9 +112,6 @@ const CupolaModel: React.FC<CupolaModelProps> = ({ onMeshesLoaded }) => {
     if (onMeshesLoaded) {
       onMeshesLoaded(meshes);
     }
-
-    console.log("Cupola loaded! Size:", size, "Scale:", scale);
-    console.log("Clickable objects:", meshes.length);
   }, [scene, onMeshesLoaded]);
 
   return <group ref={groupRef} />;
@@ -270,22 +250,17 @@ const ClickDetection: React.FC<ClickDetectionProps> = ({
     const mouse = new THREE.Vector2();
 
     const handleClick = (event: MouseEvent) => {
-      // Don't handle clicks in pointer lock mode
       if (fpMode) return;
 
-      // Calculate mouse position in normalized device coordinates
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-      // Update raycaster
       raycaster.setFromCamera(mouse, camera);
 
-      // Check for intersections
       const intersects = raycaster.intersectObjects(clickableObjects, true);
 
       if (intersects.length > 0) {
         const clickedObject = intersects[0].object;
-        console.log("Clicked on:", clickedObject.name || "unnamed object");
         onObjectClick(clickedObject);
       }
     };
@@ -300,7 +275,7 @@ const ClickDetection: React.FC<ClickDetectionProps> = ({
   return null;
 };
 
-// Instructions Panel Component
+// Instructions Panel Component with Terminal Design
 interface InstructionsPanelProps {
   onHide: () => void;
 }
@@ -310,89 +285,105 @@ const InstructionsPanel: React.FC<InstructionsPanelProps> = ({ onHide }) => {
     <div
       style={{
         position: "fixed",
-        top: 20,
-        left: 20,
-        background: "rgba(0, 0, 0, 0.85)",
-        backdropFilter: "blur(10px)",
-        color: "white",
-        padding: "20px 25px",
-        borderRadius: 12,
-        border: "1px solid rgba(100, 150, 255, 0.4)",
-        maxWidth: 320,
+        top: "100px",
+        left: "20px",
+        background: "rgba(0, 0, 0, 0.9)",
+        border: "2px solid #10b981",
+        borderRadius: "8px",
+        color: "#10b981",
+        padding: "12px",
+        maxWidth: "300px",
         zIndex: 100,
-        fontFamily: "'Segoe UI', Arial, sans-serif",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
+        fontFamily: "monospace",
+        fontSize: "13px",
       }}
     >
-      <h2
+      <div
         style={{
-          margin: "0 0 15px 0",
-          color: "#66bbff",
-          fontSize: 18,
-          fontWeight: 600,
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          marginBottom: "12px",
         }}
       >
-        Controls
-      </h2>
-
-      <div style={{ marginBottom: 12 }}>
-        <strong style={{ color: "#88ccff" }}>Orbit Mode (Default):</strong>
-        <ul style={{ margin: "5px 0", paddingLeft: 20, lineHeight: 1.6 }}>
-          <li>
-            <strong>Left Mouse:</strong> Rotate view
-          </li>
-          <li>
-            <strong>Right Mouse:</strong> Pan
-          </li>
-          <li>
-            <strong>Scroll:</strong> Zoom in/out
-          </li>
-          <li>
-            <strong>Click Object:</strong> View details
-          </li>
-        </ul>
+        <span style={{ fontSize: "18px" }}>🚀</span>
+        <span style={{ fontWeight: "bold", fontSize: "15px" }}>
+          CONTROL PANEL
+        </span>
+        <span style={{ fontSize: "14px" }}>🛸</span>
       </div>
 
-      <div style={{ marginBottom: 12 }}>
-        <strong style={{ color: "#88ccff" }}>First-Person Mode:</strong>
-        <ul style={{ margin: "5px 0", paddingLeft: 20, lineHeight: 1.6 }}>
-          <li>
-            <strong>Press E:</strong> Enter FP mode
-          </li>
-          <li>
-            <strong>W/A/S/D:</strong> Move around
-          </li>
-          <li>
-            <strong>Mouse:</strong> Look around
-          </li>
-          <li>
-            <strong>ESC:</strong> Exit FP mode
-          </li>
-        </ul>
+      <div style={{ marginBottom: "12px" }}>
+        <div
+          style={{
+            color: "#06b6d4",
+            fontWeight: "bold",
+            marginBottom: "6px",
+            fontSize: "12px",
+          }}
+        >
+          🌍 ORBIT MODE (DEFAULT):
+        </div>
+        <div
+          style={{ fontSize: "11px", lineHeight: "1.5", paddingLeft: "8px" }}
+        >
+          <div>Left Mouse - Rotate view</div>
+          <div>Right Mouse - Pan</div>
+          <div>Scroll - Zoom in/out</div>
+          <div>Click Object - View details</div>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: "12px" }}>
+        <div
+          style={{
+            color: "#06b6d4",
+            fontWeight: "bold",
+            marginBottom: "6px",
+            fontSize: "12px",
+          }}
+        >
+          👨‍🚀 FIRST-PERSON MODE:
+        </div>
+        <div
+          style={{ fontSize: "11px", lineHeight: "1.5", paddingLeft: "8px" }}
+        >
+          <div>Press E - Enter FP mode</div>
+          <div>W/A/S/D - Move around</div>
+          <div>Mouse - Look around</div>
+          <div>ESC - Exit FP mode</div>
+        </div>
       </div>
 
       <button
         onClick={onHide}
         style={{
           width: "100%",
-          background: "#0066cc",
-          color: "white",
-          border: "none",
-          padding: "8px 12px",
-          borderRadius: 6,
+          background: "transparent",
+          color: "#10b981",
+          border: "1px solid #10b981",
+          padding: "6px",
+          borderRadius: "4px",
           cursor: "pointer",
-          fontWeight: 600,
-          transition: "background 0.3s",
-          marginTop: 5,
+          fontFamily: "monospace",
+          fontWeight: "bold",
+          fontSize: "11px",
+          transition: "all 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(16, 185, 129, 0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "transparent";
         }}
       >
-        Hide Instructions
+        ✨ HIDE CONTROLS ✨
       </button>
     </div>
   );
 };
 
-// Info Panel Component
+// Info Panel Component with Terminal Design
 interface InfoPanelProps {
   info: ObjectInfo | null;
   onClose: () => void;
@@ -405,45 +396,191 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ info, onClose }) => {
     <div
       style={{
         position: "fixed",
-        top: "50%",
-        right: 30,
-        transform: "translateY(-50%)",
-        background: "rgba(0, 0, 0, 0.8)",
-        backdropFilter: "blur(10px)",
-        color: "white",
-        padding: 20,
-        borderRadius: 10,
-        border: "1px solid rgba(100, 150, 255, 0.5)",
-        maxWidth: 300,
+        top: "100px",
+        right: "20px",
+        background: "rgba(0, 0, 0, 0.9)",
+        border: "2px solid #06b6d4",
+        borderRadius: "8px",
+        color: "#06b6d4",
+        padding: "16px",
+        maxWidth: "320px",
         zIndex: 150,
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "monospace",
+        fontSize: "14px",
       }}
     >
-      <h3 style={{ marginTop: 0, color: "#66bbff" }}>Object Details</h3>
-      <p>
-        <strong>Name:</strong> {info.name}
-      </p>
-      <p>
-        <strong>Type:</strong> {info.type}
-      </p>
-      <p>
-        <strong>Position:</strong> ({info.position.x.toFixed(2)},{" "}
-        {info.position.y.toFixed(2)}, {info.position.z.toFixed(2)})
-      </p>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          marginBottom: "16px",
+        }}
+      >
+        <span style={{ fontSize: "20px" }}>📡</span>
+        <span style={{ fontWeight: "bold", fontSize: "16px" }}>
+          OBJECT DATA
+        </span>
+      </div>
+
+      <div
+        style={{ marginBottom: "12px", fontSize: "12px", lineHeight: "1.8" }}
+      >
+        <div>
+          <span style={{ color: "#10b981" }}>Name:</span> {info.name}
+        </div>
+        <div>
+          <span style={{ color: "#10b981" }}>Type:</span> {info.type}
+        </div>
+        <div>
+          <span style={{ color: "#10b981" }}>Position:</span>
+        </div>
+        <div style={{ paddingLeft: "16px" }}>
+          X: {info.position.x.toFixed(2)}
+        </div>
+        <div style={{ paddingLeft: "16px" }}>
+          Y: {info.position.y.toFixed(2)}
+        </div>
+        <div style={{ paddingLeft: "16px" }}>
+          Z: {info.position.z.toFixed(2)}
+        </div>
+      </div>
+
       <button
         onClick={onClose}
         style={{
-          marginTop: 10,
-          background: "#0066cc",
-          color: "white",
-          border: "none",
-          padding: "8px 16px",
-          borderRadius: 5,
+          width: "100%",
+          background: "transparent",
+          color: "#06b6d4",
+          border: "1px solid #06b6d4",
+          padding: "8px",
+          borderRadius: "4px",
           cursor: "pointer",
+          fontFamily: "monospace",
+          fontWeight: "bold",
+          fontSize: "12px",
+          transition: "all 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(6, 182, 212, 0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "transparent";
         }}
       >
-        Close
+        CLOSE
       </button>
+    </div>
+  );
+};
+
+// Quick fact
+interface QuickFactsPanelProps {
+  onClose: () => void;
+}
+
+const QuickFactsPanel: React.FC<QuickFactsPanelProps> = ({ onClose }) => {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: "20px",
+        right: "20px",
+        background: "rgba(0, 0, 0, 0.95)",
+        border: "2px solid #10b981",
+        borderRadius: "8px",
+        color: "#10b981",
+        padding: "16px",
+        maxWidth: "400px",
+        zIndex: 150,
+        fontFamily: "monospace",
+        fontSize: "12px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "14px",
+          borderBottom: "1px solid #10b981",
+          paddingBottom: "10px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "18px" }}>🔬</span>
+          <span
+            style={{ fontWeight: "bold", fontSize: "14px", color: "#10b981" }}
+          >
+            CUPOLA MODULE
+          </span>
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            background: "transparent",
+            border: "1px solid #10b981",
+            color: "#10b981",
+            padding: "2px 8px",
+            borderRadius: "3px",
+            cursor: "pointer",
+            fontFamily: "monospace",
+            fontSize: "10px",
+            fontWeight: "bold",
+          }}
+        >
+          ESC
+        </button>
+      </div>
+
+      <div style={{ marginBottom: "12px" }}>
+        <div
+          style={{ color: "#06b6d4", fontWeight: "bold", marginBottom: "6px" }}
+        >
+          📊 SPECIFICATIONS:
+        </div>
+        <div
+          style={{ fontSize: "11px", lineHeight: "1.6", paddingLeft: "8px" }}
+        >
+          <div>
+            <span style={{ color: "#fbbf24" }}>Mass:</span> 4,136 pounds
+          </div>
+          <div>
+            <span style={{ color: "#fbbf24" }}>Height:</span> 4.7 feet
+          </div>
+          <div>
+            <span style={{ color: "#fbbf24" }}>Diameter:</span> 9.8 feet
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: "12px" }}>
+        <div
+          style={{ color: "#06b6d4", fontWeight: "bold", marginBottom: "6px" }}
+        >
+          📸 OBSERVATION:
+        </div>
+        <div
+          style={{ fontSize: "11px", lineHeight: "1.6", paddingLeft: "8px" }}
+        >
+          Station crew members frequently point their cameras outside the cupola
+          and photograph landmarks on Earth.
+        </div>
+      </div>
+
+      <div style={{ marginBottom: "0" }}>
+        <div
+          style={{ color: "#06b6d4", fontWeight: "bold", marginBottom: "6px" }}
+        >
+          🦾 ROBOTICS:
+        </div>
+        <div
+          style={{ fontSize: "11px", lineHeight: "1.6", paddingLeft: "8px" }}
+        >
+          Astronauts can use the cupola's robotics workstation to command the
+          Canadarm2 to reach out, grapple, and install spacecraft.
+        </div>
+      </div>
     </div>
   );
 };
@@ -458,7 +595,10 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
   const [clickableObjects, setClickableObjects] = useState<THREE.Mesh[]>([]);
   const [info, setInfo] = useState<ObjectInfo | null>(null);
   const [fpMode, setFpMode] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(true);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [showQuickFacts, setShowQuickFacts] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleObjectClick = (obj: THREE.Object3D) => {
     const objectInfo: ObjectInfo = {
@@ -481,7 +621,6 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
     setClickableObjects(meshes);
   };
 
-  // Handle E key to enter FP mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "KeyE" && !fpMode) {
@@ -492,6 +631,14 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [fpMode]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.play().catch((error) => {
+        console.log("Audio autoplay blocked:", error);
+      });
+    }
+  }, []);
 
   return (
     <div
@@ -522,8 +669,14 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
         <Suspense
           fallback={
             <Html center>
-              <div style={{ color: "white", fontSize: "20px" }}>
-                Loading Cupola...
+              <div
+                style={{
+                  color: "#10b981",
+                  fontSize: "20px",
+                  fontFamily: "monospace",
+                }}
+              >
+                LOADING CUPOLA...
               </div>
             </Html>
           }
@@ -540,14 +693,8 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
           {fpMode ? (
             <>
               <PointerLockControls
-                onLock={() => {
-                  console.log("Pointer locked - Press ESC to exit");
-                  setFpMode(true);
-                }}
-                onUnlock={() => {
-                  console.log("Pointer unlocked");
-                  setFpMode(false);
-                }}
+                onLock={() => setFpMode(true)}
+                onUnlock={() => setFpMode(false)}
               />
               <FirstPersonMovement enabled={fpMode} />
             </>
@@ -566,46 +713,99 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
         </Suspense>
       </Canvas>
 
-      {/* Instructions Panel */}
       {showInstructions ? (
         <InstructionsPanel onHide={() => setShowInstructions(false)} />
       ) : (
         <button
-          onClick={() => setShowInstructions(true)}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.background = "rgba(0, 102, 204, 1)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.background = "rgba(0, 102, 204, 0.9)")
-          }
+          onClick={() => setShowInstructions(!showInstructions)}
           style={{
             position: "fixed",
-            top: 20,
-            left: 20,
-            background: "rgba(0, 102, 204, 0.9)",
-            color: "white",
-            border: "none",
-            padding: "10px 16px",
+            top: "100px",
+            left: "20px",
+            background: "rgba(0, 0, 0, 0.9)",
+            border: "2px solid #10b981",
+            color: "#10b981",
+            width: "45px",
+            height: "45px",
             borderRadius: "50%",
             cursor: "pointer",
-            fontSize: 20,
+            fontSize: "18px",
             fontWeight: "bold",
+            fontFamily: "monospace",
             zIndex: 100,
-            transition: "background 0.3s",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
+            transition: "all 0.2s",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(16, 185, 129, 0.2)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(0, 0, 0, 0.9)";
           }}
         >
           ?
         </button>
       )}
 
-      {/* Info Panel */}
       <InfoPanel info={info} onClose={() => setInfo(null)} />
+
+      <button
+        onClick={() => setShowQuickFacts(!showQuickFacts)}
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          background: "rgba(0, 0, 0, 0.9)",
+          border: "2px solid #10b981",
+          color: "#10b981",
+          padding: "10px 16px",
+          borderRadius: "6px",
+          cursor: "pointer",
+          fontSize: "12px",
+          fontWeight: "bold",
+          fontFamily: "monospace",
+          zIndex: 100,
+          transition: "all 0.2s",
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(16, 185, 129, 0.2)";
+          e.currentTarget.style.transform = "scale(1.05)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(0, 0, 0, 0.9)";
+          e.currentTarget.style.transform = "scale(1)";
+        }}
+      >
+        <span>🔬</span>
+        <span>QUICK FACTS</span>
+      </button>
+
+      <audio
+        ref={audioRef}
+        src="/public/cupola_2/cupola.mp3"
+        loop
+        preload="auto"
+      />
+
+      {showQuickFacts && (
+        <QuickFactsPanel onClose={() => setShowQuickFacts(true)} />
+      )}
+
+      <audio
+        ref={audioRef}
+        src="/public/cupola_2/cupola.mp3"
+        loop
+        preload="auto"
+      />
     </div>
   );
 };
 
-// Preload the GLTF model
 useGLTF.preload("/cupola_2/scene.glb");
 
 export default CupolaScene;
