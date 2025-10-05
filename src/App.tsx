@@ -5,15 +5,14 @@ import { About } from "./pages/About";
 import { Learn } from "./pages/Learn";
 import { NBL } from "./pages/NBL";
 import { Cupola } from "./pages/Cupola";
-import CupolaViewer from "./pages/CupolaViewer"; // <-- new import
+import CupolaViewer from "./pages/CupolaViewer";
 import { Home } from "./pages/Home";
-// import Home from "./pages/Home";
+import SplashCursorWrapper from "./components/SplashCursorWrapper";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("home");
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
-  // Initialize theme
   useEffect(() => {
     const savedTheme =
       (localStorage.getItem("theme") as "light" | "dark") || "dark";
@@ -44,31 +43,34 @@ export default function App() {
       case "nbl":
         return <NBL />;
       case "cupola":
-        // pass navigation handler so Cupola can navigate to the viewer page
         return <Cupola onNavigate={handleNavigate} />;
       case "cupola-viewer":
         return (
           <div className="h-screen w-screen">
             <CupolaViewer onNavigate={handleNavigate} />
           </div>
-        ); // new viewer page
+        );
       default:
         return <Home onNavigate={handleNavigate} />;
     }
   };
 
   return (
-    <div className="max-h-full min-h-screen bg-background text-foreground">
-      <Navigation
-        currentPage={currentPage}
-        onNavigate={handleNavigate}
-        theme={theme}
-        onThemeToggle={handleThemeToggle}
-      />
+    <SplashCursorWrapper>
+      {" "}
+      {/* Wrap everything with the cursor effect */}
+      <div className="max-h-full min-h-screen bg-background text-foreground">
+        <Navigation
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+          theme={theme}
+          onThemeToggle={handleThemeToggle}
+        />
 
-      <main>{renderPage()}</main>
+        <main>{renderPage()}</main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </SplashCursorWrapper>
   );
 }

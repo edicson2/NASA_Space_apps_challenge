@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
-import spaceWhite from "../assets/images/spacwWhite.jpg";
-import RotatingGlobe from "../components/RotatingGlobe";
+import EnhancedRotatingGlobe from "../components/EnhancedRotatingGlobe";
+import AnimatedSpaceBackground from "../components/AnimatedSpaceBackground";
 
 interface HomeProps {
   onNavigate: (page: string) => void;
@@ -23,23 +23,18 @@ export function Home({ onNavigate }: HomeProps) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#0a1128]">
+      {/* Animated Space Background */}
+      <AnimatedSpaceBackground />
       {/* Background with parallax effect */}
       <div
         className="absolute inset-0 transition-transform duration-300 ease-out"
         style={{
-          transform: `translate(${mousePosition.x}px, ${mousePosition.y}px) scale(1.1)`,
+          transform: `translate(${mousePosition.x}px, ${mousePosition.y}px) scale(1.05)`,
         }}
       >
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${spaceWhite})`,
-          }}
-        />
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden ">
-          <RotatingGlobe />
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <EnhancedRotatingGlobe />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a1128]/70 via-[#0a1128]/50 to-[#0a1128]/80" />
       </div>
 
       {/* NASA 25th Anniversary Badge - Top Right */}
@@ -122,22 +117,6 @@ export function Home({ onNavigate }: HomeProps) {
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Subtle stars decoration */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        {[...Array(50)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full opacity-60 animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`,
-            }}
-          />
-        ))}
       </div>
     </div>
   );
