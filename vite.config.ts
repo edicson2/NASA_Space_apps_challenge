@@ -4,10 +4,10 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  base: "/futuristic-landing-page-ui/",
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
     alias: {
-      // Removed explicit version aliases for easier maintenance and to avoid version mismatches.
       "@": path.resolve(__dirname, "./src"),
     },
   },
