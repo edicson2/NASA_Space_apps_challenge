@@ -37,10 +37,10 @@ export default function App() {
     switch (currentPage) {
       case "home":
         return <Home onNavigate={handleNavigate} />;
-      case "about":
-        return <About />;
-      case "learn":
-        return <Learn />;
+      // case "about":
+      //   return <About />;
+      // case "learn":
+      //   return <Learn />;
       case "nbl":
         return <NBL />;
       case "cupola":
