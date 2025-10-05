@@ -9,8 +9,9 @@ export default function CupolaViewer({
   onNavigate?: (page: string) => void;
 }) {
   return (
-    <div className="flex flex-col h-screen bg-red-900">
-      <header className="px-6 py-4 border-b border-border">
+    <div className="flex flex-col h-full w-full bg-black">
+      {/* Header */}
+      <header className="flex-shrink-0 px-6 py-4 border-b border-border bg-background">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button
@@ -27,15 +28,15 @@ export default function CupolaViewer({
         </div>
       </header>
 
-      <main className="flex-1 w-full h-screen min-h-screen">
-        <div className=" w-full h-full">
-          <div className="w-full h-full rounded-none overflow-hidden">
-            <CupolaScene />
-          </div>
-        </div>
-      </main>
-
-      <footer className="px-6 py-3">
+      <div
+        // className="absolute inset-0"
+        className=""
+        style={{ height: "100vh", width: "100%" }}
+      >
+        <CupolaScene />
+      </div>
+      {/* Footer */}
+      <footer className="flex-shrink-0 px-6 py-3 border-t border-border bg-background">
         <div className="max-w-7xl mx-auto">
           <p className="text-sm text-muted-foreground">
             Use Orbit controls or press E to enter first-person mode. Click

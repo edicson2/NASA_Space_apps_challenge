@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
-import nasaGlobe from "../assets/images/nasaGlobe.jpg";
+import EnhancedRotatingGlobe from "../components/EnhancedRotatingGlobe";
+import AnimatedSpaceBackground from "../components/AnimatedSpaceBackground";
 
 interface HomeProps {
   onNavigate: (page: string) => void;
@@ -22,20 +23,18 @@ export function Home({ onNavigate }: HomeProps) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#0a1128]">
+      {/* Animated Space Background */}
+      <AnimatedSpaceBackground />
       {/* Background with parallax effect */}
       <div
         className="absolute inset-0 transition-transform duration-300 ease-out"
         style={{
-          transform: `translate(${mousePosition.x}px, ${mousePosition.y}px) scale(1.1)`,
+          transform: `translate(${mousePosition.x}px, ${mousePosition.y}px) scale(1.05)`,
         }}
       >
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${nasaGlobe})`,
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a1128]/70 via-[#0a1128]/50 to-[#0a1128]/80" />
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <EnhancedRotatingGlobe />
+        </div>
       </div>
 
       {/* NASA 25th Anniversary Badge - Top Right */}
@@ -43,7 +42,7 @@ export function Home({ onNavigate }: HomeProps) {
         <div className="relative">
           <div className="flex flex-col items-center gap-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-4">
             <div className="flex items-center gap-2">
-              <div className="w-12 h-12 rounded-full bg-[#0B3D91] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-[#FF0000] flex items-center justify-center">
                 <svg
                   className="w-8 h-8"
                   viewBox="0 0 24 24"
@@ -118,22 +117,6 @@ export function Home({ onNavigate }: HomeProps) {
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Subtle stars decoration */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        {[...Array(50)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full opacity-60 animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`,
-            }}
-          />
-        ))}
       </div>
     </div>
   );

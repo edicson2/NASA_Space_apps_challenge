@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
-import { Home } from "./pages/Home";
 import { About } from "./pages/About";
 import { Learn } from "./pages/Learn";
 import { NBL } from "./pages/NBL";
 import { Cupola } from "./pages/Cupola";
 import CupolaViewer from "./pages/CupolaViewer"; // <-- new import
+import { Home } from "./pages/Home";
+// import Home from "./pages/Home";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -46,7 +47,11 @@ export default function App() {
         // pass navigation handler so Cupola can navigate to the viewer page
         return <Cupola onNavigate={handleNavigate} />;
       case "cupola-viewer":
-        return <CupolaViewer onNavigate={handleNavigate} />; // new viewer page
+        return (
+          <div className="h-screen w-screen">
+            <CupolaViewer onNavigate={handleNavigate} />
+          </div>
+        ); // new viewer page
       default:
         return <Home onNavigate={handleNavigate} />;
     }

@@ -114,13 +114,17 @@ const CupolaModel: React.FC<CupolaModelProps> = ({ onMeshesLoaded }) => {
     }
   }, [scene, onMeshesLoaded]);
 
-  return <group ref={groupRef} />;
+  return (
+    // @ts-ignore: groupRef.current may be a THREE.Group, allow primitive usage
+    <primitive object={groupRef.current ?? new THREE.Group()} ref={groupRef} />
+  );
 };
 
 // Lights Component
 const Lights: React.FC = () => {
   return (
     <>
+      {/* @ts-ignore: using three.js spotlight JSX from drei/three, ignore type mismatch */}
       <spotLight
         position={[0, 25, 0]}
         intensity={3000}
@@ -677,10 +681,10 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
         shadows
         gl={{
           antialias: true,
-          pixelRatio: window.devicePixelRatio,
         }}
+        dpr={window.devicePixelRatio}
       >
-        <color attach="background" args={["#000000"]} />
+        {/* Set background color using gl prop or useEffect instead of <color /> */}
 
         <Suspense
           fallback={
