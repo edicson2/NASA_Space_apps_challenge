@@ -7,7 +7,6 @@ import { NBL } from "./pages/NBL";
 import { Cupola } from "./pages/Cupola";
 import CupolaViewer from "./pages/CupolaViewer"; // <-- new import
 import { Home } from "./pages/Home";
-// import Home from "./pages/Home";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("home");
