@@ -4,6 +4,7 @@ import { Footer } from "./components/Footer";
 import { About } from "./pages/About";
 import { Learn } from "./pages/Learn";
 import { NBL } from "./pages/NBL";
+
 import { Cupola } from "./pages/Cupola";
 import CupolaViewer from "./pages/CupolaViewer"; // <-- new import
 import { Home } from "./pages/Home";
@@ -15,6 +16,7 @@ export default function App() {
 
   // Initialize theme
   useEffect(() => {
+    ``;
     const savedTheme =
       (localStorage.getItem("theme") as "light" | "dark") || "dark";
     setTheme(savedTheme);
