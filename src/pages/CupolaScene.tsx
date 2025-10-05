@@ -8,7 +8,7 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 
-// Type definitions
+// Types
 interface MoveState {
   forward: boolean;
   backward: boolean;
@@ -33,86 +33,77 @@ interface CupolaSceneProps {
   onObjectClick?: (obj: THREE.Object3D) => void;
 }
 
-// Cupola Model Component
+// Canvas Error Boundary
+class CanvasErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError)
+      return <div style={{ color: "red" }}>Failed to load 3D scene.</div>;
+    return this.props.children;
+  }
+}
+
+// Cupola Model
 const CupolaModel: React.FC<CupolaModelProps> = ({ onMeshesLoaded }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const { scene } = useGLTF("/public/cupola_2/scene.glb");
+
+  const modelPath = import.meta.env.DEV
+    ? "/cupola_2/scene.glb"
+    : "/futuristic-landing-page-ui/cupola_2/scene.glb";
+
+  const { scene } = useGLTF(modelPath);
 
   useEffect(() => {
     if (!scene || !groupRef.current) return;
 
-    // Clone the scene
     const modelClone = scene.clone(true);
 
-    // Traverse and setup materials for transparency
+    // Setup materials
     modelClone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-
-        // Make materials transparent
         if (mesh.material) {
-          const material = mesh.material as THREE.MeshStandardMaterial;
-          const materialName = material.name ? material.name.toLowerCase() : "";
-          const meshName = mesh.name ? mesh.name.toLowerCase() : "";
-
-          // Clone material to avoid affecting other instances
-          mesh.material = material.clone();
-          const mat = mesh.material as THREE.MeshStandardMaterial;
-
-          // If it's glass/window, make it very transparent
-          if (
-            materialName.includes("glass") ||
-            materialName.includes("window") ||
-            meshName.includes("glass") ||
-            meshName.includes("window")
-          ) {
-            mat.transparent = true;
-            mat.opacity = 0.2;
-            mat.side = THREE.DoubleSide;
-            mat.depthWrite = false;
-          } else {
-            // For other parts, less transparent
-            mat.transparent = true;
-            mat.opacity = 0.85;
-            mat.side = THREE.DoubleSide;
-            mat.depthWrite = false;
-          }
-
-          console.log("Material:", materialName, "Mesh:", meshName);
+          const material = (
+            mesh.material as THREE.MeshStandardMaterial
+          ).clone();
+          const name = mesh.name.toLowerCase();
+          material.transparent = true;
+          material.opacity =
+            name.includes("glass") || name.includes("window") ? 0.2 : 0.85;
+          material.side = THREE.DoubleSide;
+          material.depthWrite = false;
+          mesh.material = material;
         }
       }
     });
 
-    // Calculate bounding box to center and scale properly
+    // Center & scale
     const box = new THREE.Box3().setFromObject(modelClone);
-    const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
-
-    // Get the largest dimension
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
-
-    // Scale to fit nicely in view
-    const targetSize = 5;
-    const scale = targetSize / maxDim;
+    const scale = 5 / maxDim;
     modelClone.scale.setScalar(scale);
-
-    // Rotate 180 degrees vertically (around X axis) BEFORE positioning
     modelClone.rotation.x = Math.PI;
 
-    // Recalculate bounding box after rotation
     const rotatedBox = new THREE.Box3().setFromObject(modelClone);
     const rotatedCenter = rotatedBox.getCenter(new THREE.Vector3());
-
-    // Center the model based on rotated position
     modelClone.position.set(
       -rotatedCenter.x,
       -rotatedCenter.y + 1.05,
       -rotatedCenter.z
     );
 
-    // Clear and add to group
     while (groupRef.current.children.length > 0) {
       groupRef.current.remove(groupRef.current.children[0]);
     }
@@ -121,50 +112,31 @@ const CupolaModel: React.FC<CupolaModelProps> = ({ onMeshesLoaded }) => {
     // Collect clickable meshes
     const meshes: THREE.Mesh[] = [];
     modelClone.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        meshes.push(child as THREE.Mesh);
-      }
+      if ((child as THREE.Mesh).isMesh) meshes.push(child as THREE.Mesh);
     });
 
-    if (onMeshesLoaded) {
-      onMeshesLoaded(meshes);
-    }
-
-    console.log("Cupola loaded! Size:", size, "Scale:", scale);
-    console.log("Clickable objects:", meshes.length);
+    if (onMeshesLoaded) onMeshesLoaded(meshes);
   }, [scene, onMeshesLoaded]);
 
   return (
-    // @ts-ignore: groupRef.current may be a THREE.Group, allow primitive usage
     <primitive object={groupRef.current ?? new THREE.Group()} ref={groupRef} />
   );
 };
 
-// Lights Component
-const Lights: React.FC = () => {
-  return (
-    <>
-      {/* @ts-ignore: using three.js spotlight JSX from drei/three, ignore type mismatch */}
-      <spotLight
-        position={[0, 25, 0]}
-        intensity={3000}
-        angle={0.22}
-        penumbra={1}
-        distance={100}
-        castShadow={false}
-      />
-    </>
-  );
-};
+// Lights
+const Lights: React.FC = () => (
+  <spotLight
+    position={[0, 25, 0]}
+    intensity={3}
+    angle={0.22}
+    penumbra={1}
+    distance={100}
+    castShadow={false}
+  />
+);
 
-// First Person Movement Component
-interface FirstPersonMovementProps {
-  enabled: boolean;
-}
-
-const FirstPersonMovement: React.FC<FirstPersonMovementProps> = ({
-  enabled,
-}) => {
+// First-Person Movement
+const FirstPersonMovement: React.FC<{ enabled: boolean }> = ({ enabled }) => {
   const { camera } = useThree();
   const velocityRef = useRef(new THREE.Vector3());
   const moveRef = useRef<MoveState>({
@@ -173,12 +145,11 @@ const FirstPersonMovement: React.FC<FirstPersonMovementProps> = ({
     left: false,
     right: false,
   });
-
   const speed = 20;
-  const damping = 6.0;
+  const damping = 6;
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const down = (e: KeyboardEvent) => {
       switch (e.code) {
         case "KeyW":
           moveRef.current.forward = true;
@@ -194,8 +165,7 @@ const FirstPersonMovement: React.FC<FirstPersonMovementProps> = ({
           break;
       }
     };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
+    const up = (e: KeyboardEvent) => {
       switch (e.code) {
         case "KeyW":
           moveRef.current.forward = false;
@@ -211,38 +181,34 @@ const FirstPersonMovement: React.FC<FirstPersonMovementProps> = ({
           break;
       }
     };
-
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
     };
   }, []);
 
   useFrame((_, delta) => {
     if (!enabled) return;
-
-    const direction = new THREE.Vector3();
-    direction.z =
-      Number(moveRef.current.backward) - Number(moveRef.current.forward);
-    direction.x = Number(moveRef.current.right) - Number(moveRef.current.left);
-    direction.normalize();
+    const dir = new THREE.Vector3(
+      Number(moveRef.current.right) - Number(moveRef.current.left),
+      0,
+      Number(moveRef.current.backward) - Number(moveRef.current.forward)
+    ).normalize();
 
     velocityRef.current.x -= velocityRef.current.x * damping * delta;
     velocityRef.current.z -= velocityRef.current.z * damping * delta;
 
-    velocityRef.current.x += direction.x * speed * delta;
-    velocityRef.current.z += direction.z * speed * delta;
+    velocityRef.current.x += dir.x * speed * delta;
+    velocityRef.current.z += dir.z * speed * delta;
 
-    const forward = new THREE.Vector3(0, 0, -1);
-    forward.applyQuaternion(camera.quaternion);
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(
+      camera.quaternion
+    );
     forward.y = 0;
     forward.normalize();
-
-    const right = new THREE.Vector3(1, 0, 0);
-    right.applyQuaternion(camera.quaternion);
+    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
     right.y = 0;
     right.normalize();
 
@@ -253,158 +219,72 @@ const FirstPersonMovement: React.FC<FirstPersonMovementProps> = ({
   return null;
 };
 
-// Click Detection Component
-interface ClickDetectionProps {
+// Click Detection
+const ClickDetection: React.FC<{
   clickableObjects: THREE.Mesh[];
   onObjectClick: (obj: THREE.Object3D) => void;
   fpMode: boolean;
-}
-
-const ClickDetection: React.FC<ClickDetectionProps> = ({
-  clickableObjects,
-  onObjectClick,
-  fpMode,
-}) => {
+}> = ({ clickableObjects, onObjectClick, fpMode }) => {
   const { camera, gl } = useThree();
-
   useEffect(() => {
-    if (clickableObjects.length === 0) return;
-
+    if (!clickableObjects.length) return;
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-
-    const handleClick = (event: MouseEvent) => {
-      // Don't handle clicks in pointer lock mode
+    const handleClick = (e: MouseEvent) => {
       if (fpMode) return;
-
-      // Calculate mouse position in normalized device coordinates
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-      // Update raycaster
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
-
-      // Check for intersections
       const intersects = raycaster.intersectObjects(clickableObjects, true);
-
-      if (intersects.length > 0) {
-        const clickedObject = intersects[0].object;
-        console.log("Clicked on:", clickedObject.name || "unnamed object");
-        onObjectClick(clickedObject);
-      }
+      if (intersects.length) onObjectClick(intersects[0].object);
     };
-
     gl.domElement.addEventListener("click", handleClick);
-
-    return () => {
-      gl.domElement.removeEventListener("click", handleClick);
-    };
+    return () => gl.domElement.removeEventListener("click", handleClick);
   }, [clickableObjects, camera, gl, onObjectClick, fpMode]);
-
   return null;
 };
 
-// Instructions Panel Component
-interface InstructionsPanelProps {
-  onHide: () => void;
-}
-
-const InstructionsPanel: React.FC<InstructionsPanelProps> = ({ onHide }) => {
-  return (
-    <div
+// Instructions Panel
+const InstructionsPanel: React.FC<{ onHide: () => void }> = ({ onHide }) => (
+  <div
+    style={{
+      position: "fixed",
+      top: 20,
+      left: 20,
+      background: "rgba(0,0,0,0.85)",
+      backdropFilter: "blur(10px)",
+      color: "white",
+      padding: 20,
+      borderRadius: 12,
+      border: "1px solid rgba(100,150,255,0.4)",
+      maxWidth: 320,
+      zIndex: 100,
+    }}
+  >
+    <h2 style={{ margin: 0, marginBottom: 15, color: "#66bbff" }}>Controls</h2>
+    <p>Use mouse to orbit, click objects to view info, press E for FP mode</p>
+    <button
+      onClick={onHide}
       style={{
-        position: "fixed",
-        top: 20,
-        left: 20,
-        background: "rgba(0, 0, 0, 0.85)",
-        backdropFilter: "blur(10px)",
+        marginTop: 10,
+        background: "#0066cc",
         color: "white",
-        padding: "20px 25px",
-        borderRadius: 12,
-        border: "1px solid rgba(100, 150, 255, 0.4)",
-        maxWidth: 320,
-        zIndex: 100,
-        fontFamily: "'Segoe UI', Arial, sans-serif",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
+        padding: "8px 12px",
+        border: "none",
+        borderRadius: 6,
       }}
     >
-      <h2
-        style={{
-          margin: "0 0 15px 0",
-          color: "#66bbff",
-          fontSize: 18,
-          fontWeight: 600,
-        }}
-      >
-        Controls
-      </h2>
+      Hide
+    </button>
+  </div>
+);
 
-      <div style={{ marginBottom: 12 }}>
-        <strong style={{ color: "#88ccff" }}>Orbit Mode (Default):</strong>
-        <ul style={{ margin: "5px 0", paddingLeft: 20, lineHeight: 1.6 }}>
-          <li>
-            <strong>Left Mouse:</strong> Rotate view
-          </li>
-          <li>
-            <strong>Right Mouse:</strong> Pan
-          </li>
-          <li>
-            <strong>Scroll:</strong> Zoom in/out
-          </li>
-          <li>
-            <strong>Click Object:</strong> View details
-          </li>
-        </ul>
-      </div>
-
-      <div style={{ marginBottom: 12 }}>
-        <strong style={{ color: "#88ccff" }}>First-Person Mode:</strong>
-        <ul style={{ margin: "5px 0", paddingLeft: 20, lineHeight: 1.6 }}>
-          <li>
-            <strong>Press E:</strong> Enter FP mode
-          </li>
-          <li>
-            <strong>W/A/S/D:</strong> Move around
-          </li>
-          <li>
-            <strong>Mouse:</strong> Look around
-          </li>
-          <li>
-            <strong>ESC:</strong> Exit FP mode
-          </li>
-        </ul>
-      </div>
-
-      <button
-        onClick={onHide}
-        style={{
-          width: "100%",
-          background: "#0066cc",
-          color: "white",
-          border: "none",
-          padding: "8px 12px",
-          borderRadius: 6,
-          cursor: "pointer",
-          fontWeight: 600,
-          transition: "background 0.3s",
-          marginTop: 5,
-        }}
-      >
-        Hide Instructions
-      </button>
-    </div>
-  );
-};
-
-// Info Panel Component
-interface InfoPanelProps {
-  info: ObjectInfo | null;
-  onClose: () => void;
-}
-
-const InfoPanel: React.FC<InfoPanelProps> = ({ info, onClose }) => {
+// Info Panel
+const InfoPanel: React.FC<{ info: ObjectInfo | null; onClose: () => void }> = ({
+  info,
+  onClose,
+}) => {
   if (!info) return null;
-
   return (
     <div
       style={{
@@ -412,18 +292,14 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ info, onClose }) => {
         top: "50%",
         right: 30,
         transform: "translateY(-50%)",
-        background: "rgba(0, 0, 0, 0.8)",
-        backdropFilter: "blur(10px)",
-        color: "white",
+        background: "rgba(0,0,0,0.8)",
         padding: 20,
         borderRadius: 10,
-        border: "1px solid rgba(100, 150, 255, 0.5)",
-        maxWidth: 300,
+        color: "white",
         zIndex: 150,
-        fontFamily: "Arial, sans-serif",
       }}
     >
-      <h3 style={{ marginTop: 0, color: "#66bbff" }}>Object Details</h3>
+      <h3 style={{ color: "#66bbff" }}>Object Details</h3>
       <p>
         <strong>Name:</strong> {info.name}
       </p>
@@ -443,7 +319,6 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ info, onClose }) => {
           border: "none",
           padding: "8px 16px",
           borderRadius: 5,
-          cursor: "pointer",
         }}
       >
         Close
@@ -452,7 +327,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ info, onClose }) => {
   );
 };
 
-// Main Scene Component
+// Main Scene
 const CupolaScene: React.FC<CupolaSceneProps> = ({
   className,
   style,
@@ -465,36 +340,23 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
   const [showInstructions, setShowInstructions] = useState(true);
 
   const handleObjectClick = (obj: THREE.Object3D) => {
-    const objectInfo: ObjectInfo = {
+    setInfo({
       name: obj.name || "Unnamed",
       type: obj.type,
-      position: {
-        x: obj.position.x,
-        y: obj.position.y,
-        z: obj.position.z,
-      },
-    };
-    setInfo(objectInfo);
-
-    if (onObjectClick) {
-      onObjectClick(obj);
-    }
+      position: obj.position,
+    });
+    if (onObjectClick) onObjectClick(obj);
   };
 
-  const handleMeshesLoaded = (meshes: THREE.Mesh[]) => {
+  const handleMeshesLoaded = (meshes: THREE.Mesh[]) =>
     setClickableObjects(meshes);
-  };
 
-  // Handle E key to enter FP mode
+  // Enter FP mode
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "KeyE" && !fpMode) {
-        setFpMode(true);
-      }
+    const down = (e: KeyboardEvent) => {
+      if (e.code === "KeyE" && !fpMode) setFpMode(true);
     };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", down);
   }, [fpMode]);
 
   return (
@@ -509,84 +371,65 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
       }}
     >
       <Canvas
-        camera={{
-          position: cameraPosition,
-          fov: 45,
-          near: 0.01,
-          far: 1000,
-        }}
+        camera={{ position: cameraPosition, fov: 45, near: 0.01, far: 1000 }}
         shadows
-        gl={{
-          antialias: true,
-        }}
+        gl={{ antialias: true }}
         dpr={window.devicePixelRatio}
       >
-        {/* Set background color using gl prop or useEffect instead of <color /> */}
+        <CanvasErrorBoundary>
+          <Suspense
+            fallback={
+              <Html center>
+                <div style={{ color: "white", fontSize: 20 }}>
+                  Loading Cupola...
+                </div>
+              </Html>
+            }
+          >
+            <Lights />
+            <CupolaModel onMeshesLoaded={handleMeshesLoaded} />
 
-        <Suspense
-          fallback={
-            <Html center>
-              <div style={{ color: "white", fontSize: "20px" }}>
-                Loading Cupola...
-              </div>
-            </Html>
-          }
-        >
-          <Lights />
-          <CupolaModel onMeshesLoaded={handleMeshesLoaded} />
-
-          <ClickDetection
-            clickableObjects={clickableObjects}
-            onObjectClick={handleObjectClick}
-            fpMode={fpMode}
-          />
-
-          {fpMode ? (
-            <>
-              <PointerLockControls
-                onLock={() => {
-                  console.log("Pointer locked - Press ESC to exit");
-                  setFpMode(true);
-                }}
-                onUnlock={() => {
-                  console.log("Pointer unlocked");
-                  setFpMode(false);
-                }}
-              />
-              <FirstPersonMovement enabled={fpMode} />
-            </>
-          ) : (
-            <OrbitControls
-              enableDamping
-              dampingFactor={0.05}
-              enablePan
-              minDistance={0.5}
-              maxDistance={50}
-              minPolarAngle={0}
-              maxPolarAngle={Math.PI}
-              target={[0, 1, 0]}
+            <ClickDetection
+              clickableObjects={clickableObjects}
+              onObjectClick={handleObjectClick}
+              fpMode={fpMode}
             />
-          )}
-        </Suspense>
+
+            {fpMode ? (
+              <>
+                <PointerLockControls
+                  onLock={() => setFpMode(true)}
+                  onUnlock={() => setFpMode(false)}
+                />
+                <FirstPersonMovement enabled={fpMode} />
+              </>
+            ) : (
+              <OrbitControls
+                enableDamping
+                dampingFactor={0.05}
+                enablePan
+                minDistance={0.5}
+                maxDistance={50}
+                minPolarAngle={0}
+                maxPolarAngle={Math.PI}
+                target={[0, 1, 0]}
+              />
+            )}
+          </Suspense>
+        </CanvasErrorBoundary>
       </Canvas>
 
-      {/* Instructions Panel */}
+      {/* Instructions */}
       {showInstructions ? (
         <InstructionsPanel onHide={() => setShowInstructions(false)} />
       ) : (
         <button
           onClick={() => setShowInstructions(true)}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.background = "rgba(0, 102, 204, 1)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.background = "rgba(0, 102, 204, 0.9)")
-          }
           style={{
             position: "fixed",
             top: 20,
             left: 20,
-            background: "rgba(0, 102, 204, 0.9)",
+            background: "rgba(0,102,204,0.9)",
             color: "white",
             border: "none",
             padding: "10px 16px",
@@ -595,8 +438,6 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
             fontSize: 20,
             fontWeight: "bold",
             zIndex: 100,
-            transition: "background 0.3s",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
           }}
         >
           ?
@@ -609,7 +450,11 @@ const CupolaScene: React.FC<CupolaSceneProps> = ({
   );
 };
 
-// Preload the GLTF model
-useGLTF.preload("/cupola_2/scene.glb");
+// Preload GLTF
+const modelPath = import.meta.env.DEV
+  ? "/cupola_2/scene.glb"
+  : "/futuristic-landing-page-ui/cupola_2/scene.glb";
+
+useGLTF.preload(modelPath);
 
 export default CupolaScene;
