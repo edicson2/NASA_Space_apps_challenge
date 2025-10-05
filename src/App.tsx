@@ -68,7 +68,7 @@ export default function App() {
 
       <main>{renderPage()}</main>
 
-      <Footer />
+      {currentPage === "home" && <Footer />}
     </div>
   );
 }

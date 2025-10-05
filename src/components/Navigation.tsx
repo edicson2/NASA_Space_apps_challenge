@@ -140,21 +140,13 @@ export function Navigation({
               )}
 
               {/* Right Controls */}
-              {/* <div className={styles.rightControls}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onThemeToggle}
-                  className={styles.themeButton}
-                >
-                  {theme === "dark" ? (
-                    <Sun className="h-5 w-5" />
-                  ) : (
-                    <Moon className="h-5 w-5" />
-                  )}
-                </Button>
-                <ISSTracker />
-              </div> */}
+              <div className={styles.rightControls}>
+                <img
+                  src="/nasa/spaceAppLogo.png"
+                  alt="Space App Logo"
+                  className="h-10 w-auto object-contain"
+                />
+              </div>
             </div>
 
             {/* Mobile Links (only show on mobile) */}

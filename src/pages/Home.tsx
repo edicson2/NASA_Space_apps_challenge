@@ -37,33 +37,6 @@ export function Home({ onNavigate }: HomeProps) {
         </div>
       </div>
 
-      {/* NASA 25th Anniversary Badge - Top Right */}
-      <div className="absolute top-24 right-8 z-20">
-        <div className="relative">
-          <div className="flex flex-col items-center gap-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-4">
-            <div className="flex items-center gap-2">
-              <div className="w-12 h-12 rounded-full bg-[#FF0000] flex items-center justify-center">
-                <svg
-                  className="w-8 h-8"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                    fill="white"
-                  />
-                </svg>
-              </div>
-              <div className="text-white">
-                <div className="text-xs opacity-90">NASA</div>
-                <div className="font-semibold">25th Anniversary</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center pt-20">
         <div className="max-w-4xl mx-auto space-y-8">
