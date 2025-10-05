@@ -26,7 +26,7 @@ export default function CupolaViewer({ onNavigate }) {
       </header>
 
       {/* Scene container */}
-      <div style={{ flex: 1, width: "100%", height: "100vh" }}>
+      <div style={{ flex: 1, width: "100%", height: "100vh" }} className="absolute inset-0">
         <CupolaScene />
       </div>
 
