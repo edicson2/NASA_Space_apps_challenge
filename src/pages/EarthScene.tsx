@@ -1,5 +1,7 @@
+// EarthScene.tsx
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import SpyglassMap from "../components/spyglassFiles/spyglassMap/SpyglassMap";
 
 const EarthScene: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -104,7 +106,7 @@ const EarthScene: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{ textAlign: "center", position: "relative" }}>
       <div
         ref={mountRef}
         style={{
@@ -129,10 +131,13 @@ const EarthScene: React.FC = () => {
         }}
       />
       {coords && (
-        <p>
-          📍 Clicked → Latitude: {coords.lat.toFixed(2)}°, Longitude:{" "}
-          {coords.lon.toFixed(2)}°
-        </p>
+        <>
+          <p>
+            📍 Clicked → Latitude: {coords.lat.toFixed(2)}°, Longitude:{" "}
+            {coords.lon.toFixed(2)}°
+          </p>
+          <SpyglassMap lat={coords.lat} lon={coords.lon} />
+        </>
       )}
     </div>
   );
