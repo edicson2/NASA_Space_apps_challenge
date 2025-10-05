@@ -28,11 +28,11 @@ export default function CupolaViewer({
         </div>
       </header>
 
-      {/* Main 3D Scene - fills remaining space */}
-      {/* <main className="flex-1 relative overflow-hidden min-h-0">
-        <CupolaScene />
-      </main> */}
-      <div className="absolute inset-0">
+      <div
+        // className="absolute inset-0"
+        className=""
+        style={{ height: "100vh", width: "100%" }}
+      >
         <CupolaScene />
       </div>
       {/* Footer */}
