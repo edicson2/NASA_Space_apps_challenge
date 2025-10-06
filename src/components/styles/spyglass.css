@@ -1,5 +1,5 @@
 .spyglass-container {
-  position: relative;
+  position: fixed;
   width: 100vw;
   height: 100vh;
   background: #000;
@@ -56,18 +56,11 @@
 /* Legend box */
 .legend-container {
   position: absolute;
-  right: 20px;
-  bottom: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid #0ff;
-  border-radius: 10px;
-  padding: 12px;
-  width: 260px;
-  max-height: 60vh;
-  overflow-y: auto;
-  color: #fff;
-  font-family: sans-serif;
-  box-shadow: 0 0 20px #0ff;
+  background: rgba(0,0,0,0.7);
+  padding: 8px;
+  border-radius: 4px;
+  color: white;
+  z-index: 1000; /* High enough to be above the canvas, but not obscure it */
 }
 
 .legend-container h4 {
@@ -93,3 +86,20 @@
 .legend-text {
   font-size: 0.9rem;
 }
+
+/* .legend-container {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px;
+  border-radius: 4px;
+  color: white;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.legend-color {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+} */
