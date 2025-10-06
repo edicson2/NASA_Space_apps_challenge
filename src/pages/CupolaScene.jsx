@@ -9,6 +9,8 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 
+import SpyglassMap from "../components/spyglassFiles/spyglassMap/SpyglassMap";
+
 /** ---------------------------
  * Shader-based Starfield (full background)
  * --------------------------- */
@@ -168,20 +170,12 @@ function Lights() {
 /** ---------------------------
  * Earth
  * --------------------------- */
-function Earth({ onHover }) {
-  const earthTex = useMemo(
-    () =>
-      new THREE.TextureLoader().load(
-        `${import.meta.env.BASE_URL}maps/Earth-1440x720.jpg`
-      ),
-    []
+function Earth({ onHover, onClick }) {
+  const earthTex = useMemo(() =>
+    new THREE.TextureLoader().load(`${import.meta.env.BASE_URL}maps/Earth-1440x720.jpg`), []
   );
-  const cloudsTex = useMemo(
-    () =>
-      new THREE.TextureLoader().load(
-        `${import.meta.env.BASE_URL}maps/flat_earth_still_clouds.jpg`
-      ),
-    []
+  const cloudsTex = useMemo(() =>
+    new THREE.TextureLoader().load(`${import.meta.env.BASE_URL}maps/flat_earth_still_clouds.jpg`), []
   );
 
   const earthRef = useRef();
@@ -189,12 +183,12 @@ function Earth({ onHover }) {
   const EARTH_Z = -400;
   const EARTH_R = 200;
 
-  useFrame((_, dt) => {
-    if (earthRef.current) earthRef.current.rotation.y += dt * 0.03;
-    if (cloudRef.current) cloudRef.current.rotation.y += dt * 0.04;
-  });
-
   const { camera, gl } = useThree();
+
+  useFrame((_, dt) => {
+    if (earthRef.current) earthRef.current.rotation.y += dt * 0.01;
+    if (cloudRef.current) cloudRef.current.rotation.y += dt * 0.015;
+  });
 
   useEffect(() => {
     const raycaster = new THREE.Raycaster();
@@ -209,10 +203,7 @@ function Earth({ onHover }) {
         earthRef.current.updateMatrixWorld(true);
         const intersects = raycaster.intersectObject(earthRef.current, true);
         if (intersects.length > 0) {
-          const p = intersects[0].point
-            .clone()
-            .sub(new THREE.Vector3(0, 0, EARTH_Z))
-            .normalize();
+          const p = intersects[0].point.clone().sub(new THREE.Vector3(0, 0, EARTH_Z)).normalize();
           const lat = Math.asin(p.y) * (180 / Math.PI);
           const lon = Math.atan2(p.z, p.x) * (180 / Math.PI);
           onHover({
@@ -227,9 +218,31 @@ function Earth({ onHover }) {
       }
     };
 
+    const handleClick = (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      if (earthRef.current) {
+        earthRef.current.updateMatrixWorld(true);
+        const intersects = raycaster.intersectObject(earthRef.current, true);
+        if (intersects.length > 0) {
+          const p = intersects[0].point.clone().sub(new THREE.Vector3(0, 0, EARTH_Z)).normalize();
+          const lat = Math.asin(p.y) * (180 / Math.PI);
+          const lon = Math.atan2(p.z, p.x) * (180 / Math.PI);
+          onClick({ lat: lat.toFixed(2), lon: lon.toFixed(2), x: event.clientX, y: event.clientY });
+        }
+      }
+    };
+
     gl.domElement.addEventListener("mousemove", handleMove);
-    return () => gl.domElement.removeEventListener("mousemove", handleMove);
-  }, [camera, gl, onHover]);
+    gl.domElement.addEventListener("click", handleClick);
+
+    return () => {
+      gl.domElement.removeEventListener("mousemove", handleMove);
+      gl.domElement.removeEventListener("click", handleClick);
+    };
+  }, [camera, gl, onHover, onClick]);
 
   return (
     <>
@@ -250,6 +263,7 @@ function Earth({ onHover }) {
     </>
   );
 }
+
 /** ---------------------------
  * Tooltip
  * --------------------------- */
@@ -281,6 +295,8 @@ function Tooltip({ coords }) {
  * --------------------------- */
 export default function CupolaScene() {
   const [coords, setCoords] = useState(null);
+  const [spyglassCoords, setSpyglassCoords] = useState(null); // ✅ store click
+
   const [fpMode, setFpMode] = useState(false);
 
   useEffect(() => {
@@ -303,34 +319,32 @@ export default function CupolaScene() {
         }}
         dpr={[1, 2]}
       >
-        <Suspense
-          fallback={
-            <Html center>
-              <div style={{ color: "white" }}>Loading Cupola…</div>
-            </Html>
-          }
-        >
+        <Suspense fallback={<Html center><div style={{ color: "white" }}>Loading Cupola…</div></Html>}>
           <StarfieldBackground />
           <Lights />
-          <Earth onHover={setCoords} />
+          <Earth onHover={setCoords} onClick={setSpyglassCoords} /> {/* ✅ */}
           <CupolaModel />
-          {fpMode ? (
-            <PointerLockControls />
-          ) : (
-            <OrbitControls
-              target={[0, 0, -80]}
-              enableDamping
-              dampingFactor={0.05}
-              enableZoom={false} // 🚫 disables zooming
-            />
-          )}
+          {fpMode ? <PointerLockControls /> : <OrbitControls target={[0, 0, -80]} enableDamping dampingFactor={0.05} enableZoom={false} />}
         </Suspense>
       </Canvas>
 
       <Tooltip coords={coords} />
+
+      {/* Spyglass overlay */}
+      {spyglassCoords && (
+  <SpyglassMap
+    lat={parseFloat(spyglassCoords.lat)}
+    lon={parseFloat(spyglassCoords.lon)}
+    x={spyglassCoords.x}
+    y={spyglassCoords.y}
+  />
+)}
+
+
     </>
   );
 }
+
 
 // ✅ Preload with Vite-safe path
 useGLTF.preload(`${import.meta.env.BASE_URL}cupola_2/scene.glb`);

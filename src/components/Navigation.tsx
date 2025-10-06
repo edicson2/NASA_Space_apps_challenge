@@ -27,8 +27,8 @@ export function Navigation({
     { name: "Home", id: "home" },
     { name: "Cupola", id: "cupola" },
     { name: "NBL", id: "nbl" },
-    { name: "Learn", id: "learn" },
-    { name: "About", id: "about" },
+    // { name: "Learn", id: "learn" },
+    // { name: "About", id: "about" },
   ];
 
   // Idle hide logic
