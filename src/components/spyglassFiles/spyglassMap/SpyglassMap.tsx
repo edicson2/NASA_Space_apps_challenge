@@ -48,9 +48,10 @@ const SpyglassMap: React.FC<SpyglassMapProps> = ({ lat, lon, x, y }) => {
     zoom: 7,
   });
 
-  const dateString = new Date().toISOString().split("T")[0];
-  const gibsUrl =
-    "https://gibs-{a-c}.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi";
+  const today = new Date();
+  today.setDate(today.getDate() - 7); // Last week's date
+  const dateString = today.toISOString().split('T')[0];;
+  const gibsUrl = `https://gibs-{a-c}.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi?TIME=${dateString}`;
 
   const gibsLayer = new TileLayer({
     source: new WMTS({
@@ -60,8 +61,7 @@ const SpyglassMap: React.FC<SpyglassMapProps> = ({ lat, lon, x, y }) => {
       matrixSet: "250m",
       tileGrid,
       style: "default",
-      requestEncoding: "KVP",
-      dimensions: { TIME: dateString },
+      requestEncoding: "KVP"
     }),
   });
 
