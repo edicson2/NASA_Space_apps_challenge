@@ -8,26 +8,11 @@ export function Footer() {
           {/* NASA Logo */}
           <div className="flex items-center gap-3">
             <div className="w-16 h-16 rounded-full bg-[#0B3D91] flex items-center justify-center">
-              <svg
-                className="w-10 h-10"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="white"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M8 12h8M12 8v8"
-                  stroke="white"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
+              <img
+                src="https://science.nasa.gov/wp-content/themes/nasa-child/assets/images/nasa-logo.svg"
+                alt="NASA Logo"
+                // className="w-10 h-10 object-contain"
+              />
             </div>
             <div>
               <div className="font-semibold">NASA</div>
@@ -43,8 +28,8 @@ export function Footer() {
             <p className="mt-1">
               Alpha Super Awesome Cool Dynamite Wolf Squadron
             </p>
-            <p className="mt-1">
-              Linh Tran • Johsua Onyema • Ishaq Omotosho • Edicson Garcia •
+            <p className="mt-1 text-xs">
+              Linh Tran • Joshua Onyema • Ishaq Omotosho • Edicson Garcia •
               Manuel Alejandro Vergas Peña
             </p>
             <p className="mt-2 text-xs">
@@ -55,22 +40,12 @@ export function Footer() {
           {/* Social Links */}
           <div className="flex items-center justify-end gap-4">
             <a
-              href="#"
+              href="https://github.com/edicson2/NASA_Space_apps_challenge"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <Github className="h-5 w-5" />
-            </a>
-            <a
-              href="#"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Twitter className="h-5 w-5" />
-            </a>
-            <a
-              href="#"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Mail className="h-5 w-5" />
             </a>
           </div>
         </div>

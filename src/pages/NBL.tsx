@@ -131,17 +131,7 @@ export function NBL() {
                   Open in new tab <ExternalLink className="h-4 w-4" />
                 </a>
               </div>
-              <p className="text-sm text-muted-foreground">
-                <strong>
-                  Play directly inside the page. Use W/A/S/D or Arrow keys to
-                  move. Press P to pause.
-                </strong>
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Weightless Wonders is an immersive educational web game designed
-                to teach players key concepts about gravity and movement in
-                space.
-              </p>
+
               {/* Slightly more vertical and horizontal space */}
               <div className="-mx-4 sm:-mx-6 md:-mx-8">
                 <AspectRatio ratio={5 / 4}>
@@ -155,6 +145,17 @@ export function NBL() {
                   />
                 </AspectRatio>
               </div>
+              <p className="text-sm text-muted-foreground">
+                <strong>
+                  Play directly inside the page. Use W/A/S/D or Arrow keys to
+                  move. Press P to pause.
+                </strong>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Weightless Wonders is an immersive educational web game designed
+                to teach players key concepts about gravity and movement in
+                space.
+              </p>
             </Card>
           </div>
 
