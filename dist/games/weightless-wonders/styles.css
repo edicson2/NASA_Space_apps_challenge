@@ -1,0 +1,321 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.header-text {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #666; /* Dark grey color */
+  font-size: 30px;
+  animation: floatAnimation 5s infinite;
+}
+
+@keyframes floatAnimation {
+  0% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-20px);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+}
+
+.star {
+  position: absolute;
+  background-color: grey;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+/* Animation */
+@keyframes subtitleFade {
+  0% {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* --- Menu & UI --- */
+.hidden { display: none; }
+
+/* NASA Logo styles */
+.nasa-logo {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.nasa-logo img {
+  filter: brightness(1.2);
+}
+
+.nasa-logo:hover {
+  opacity: 1;
+}
+
+/* Reveal Animation Styles */
+.copy-wrap {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.copy-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1e3c72;
+  transform: translateX(-100%);
+  transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.reveal .copy-wrap::before {
+  transform: translateX(100%);
+}
+
+.menu.reveal .menu-title,
+.menu.reveal .menu-sub,
+.menu.reveal .menu-actions {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.menu {
+  position: absolute;
+  top: 45%; /* Moved up slightly */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #ffffff;
+  padding: 0;
+  width: 92vw;
+  max-width: 1400px;
+  z-index: 200;
+  pointer-events: auto;
+}
+
+.menu.reveal .menu-title,
+.menu.reveal .menu-sub,
+.menu.reveal .menu-actions {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: revealContent 0.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  animation-delay: 0.6s;
+}
+
+.menu.reveal .menu-sub {
+  animation-delay: 0.7s;
+}
+
+.menu.reveal .menu-actions {
+  animation-delay: 0.8s;
+}
+
+@keyframes revealContent {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animated title styles */
+.menu-title {
+  font-family: 'Lora', serif;
+  font-size: 90px; /* Larger size */
+  margin: 0 0 2rem 0; /* More space below */
+  letter-spacing: 10px;
+  position: relative;
+  color: transparent; /* Hide original text */
+}
+
+.menu-title svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+}
+
+.menu-title svg text {
+  font-family: 'Lora', serif;
+  letter-spacing: 10px;
+  stroke: #4776b9;
+  font-size: 90px;
+  font-weight: 700;
+  stroke-width: 3;
+  animation: textAnimate 5s infinite alternate;
+}
+
+@keyframes textAnimate {
+  0% {
+    stroke-dasharray: 0 50%;
+    stroke-dashoffset: 20%;
+    fill: #ffffff;
+  }
+  100% {
+    stroke-dasharray: 50% 0;
+    stroke-dashoffset: -20%;
+    fill: rgba(255, 255, 255, 0);
+  }
+}
+
+.menu-sub {
+  margin: 0 0 2rem 0;
+  color: #d7e6f5;
+  font-size: 1.4rem;
+  font-weight: 300;
+  letter-spacing: 1px;
+  line-height: 1.6;
+  text-transform: capitalize;
+  opacity: 0.9;
+  background: linear-gradient(135deg, #ffffff, #a3c7e9);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: subtitleFade 2s ease-in-out infinite alternate;
+}
+
+.btn {
+  cursor: pointer;
+  border: none;
+  padding: 0.9rem 1.5rem;
+  font-size: 1.05rem;
+  border-radius: 8px;
+  margin: 0.25rem;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  font-weight: 600;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #1e3c72, #7ef3e6);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(30, 60, 114, 0.3);
+}
+
+.btn.secondary {
+  background: rgba(255,255,255,0.18);
+  color: #041022;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.btn:hover, .btn:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+}
+
+.btn.secondary:hover { background: rgba(255,255,255,0.18); }
+
+/* make HUD and game container sit below menu */
+.game-container { z-index: 10; }
+.hud { z-index: 5; }
+
+/* Progress bar styles */
+.score-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  width: 120px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff8c2d, #ffa94d);
+  transition: width 0.3s ease;
+}
+
+/* Level specific backgrounds */
+.game-container[data-level="3"] #gameCanvas {
+  background: url('assets/lvl3 background.png') center/cover no-repeat;
+}
+
+.game-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 98vw;
+  max-width: 1600px;
+  height: 86vh; /* larger game area */
+  max-height: 1100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border-radius: 12px;
+}
+
+.hud {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  color: #fff;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.gravity-slider { width: 160px; }
+
+.level-list { margin-top: 0.5rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+.menu-actions { display:flex; flex-direction:column; gap:0.75rem; align-items:center; }
+
+@media (max-width: 600px) {
+  .menu-title { font-size: 32px; }
+  .game-container { height: 55vh; }
+}
