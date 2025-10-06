@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weightless Wonders</title>
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- NASA Logo -->
+  <div class="nasa-logo">
+    <img src="assets/nasa logo.png" alt="NASA Logo" width="100" height="auto">
+  </div>
+
+  <!-- Top bar: instructions and objective (moved to top per user request) -->
+  <div id="topbar" class="topbar" style="position:fixed;left:0;right:0;top:8px;display:flex;justify-content:center;gap:24px;z-index:60;pointer-events:none;">
+    <div id="objective" class="objective" style="pointer-events:auto;background:transparent;color:#fff;padding:6px 12px;border-radius:6px;">Objective: collect 2 stars</div>
+    <div id="instructions" class="instructions" style="pointer-events:auto;background:transparent;color:#ddd;padding:6px 12px;border-radius:6px;">Controls: Use W, A, S, D or Arrow keys to move. Press P to pause</div>
+  </div>
+
+  <div class="starfield" title="This is a starfield background."></div>
+
+  <!-- Main Menu (uses existing starfield background) -->
+  <div id="menu" class="menu">
+    <h1 class="menu-title">
+      <span class="copy-wrap">
+        <svg viewBox="0 0 1200 200">
+          <text x="50%" y="50%" text-anchor="middle" dy=".35em">Weightless Wonders</text>
+        </svg>
+        Weightless Wonders
+      </span>
+    </h1>
+    <p class="menu-sub">
+      <span class="copy-wrap">Learn about gravity, weightlessness, and orbital motion</span>
+    </p>
+    <div class="menu-actions">
+      <button id="startButton" class="btn primary">Start</button>
+    </div>
+  </div>
+
+
+  <!-- Game Canvas for Level 1 (hidden until Start is pressed) -->
+  <div id="gameContainer" class="game-container hidden">
+    <canvas id="gameCanvas" width="1024" height="576"></canvas>
+    <div id="hud" class="hud">
+      <div class="hud-left">
+        <div class="score-container">
+          <span id="score">Stars: 0</span>
+          <div class="progress-bar">
+            <div id="progress" class="progress"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script> <!-- Link to external JavaScript module -->
+</body>
+
+</html>
