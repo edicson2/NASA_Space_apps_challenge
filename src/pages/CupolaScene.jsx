@@ -84,17 +84,15 @@ function StarfieldBackground() {
  * --------------------------- */
 const CupolaModel = ({ microgravity }) => {
   const group = useRef(null);
-
   const gltfPath = `${import.meta.env.BASE_URL}cupola_2/scene.glb`;
   const { scene } = useGLTF(gltfPath);
-
-  // drift variables
   const t = useRef(0);
 
+  // microgravity tilt
   useFrame((_, dt) => {
     if (microgravity && group.current) {
       t.current += dt;
-      group.current.rotation.z = Math.sin(t.current * 0.2) * 0.02; // slight tilt
+      group.current.rotation.z = Math.sin(t.current * 0.2) * 0.02;
     }
   });
 
@@ -136,14 +134,13 @@ const CupolaModel = ({ microgravity }) => {
         group.current.remove(group.current.children[0]);
       }
 
-      modelClone.rotation.x = Math.PI;
+      modelClone.rotation.x = Math.PI / 1.65;
       modelClone.scale.setScalar(0.9);
-
       group.current.add(modelClone);
     }
   }, [scene]);
 
-  return <group ref={group} />;
+  return <group ref={group} position={[0, 1, 0]} />;
 };
 
 /** ---------------------------
@@ -160,7 +157,7 @@ function Lights() {
 }
 
 /** ---------------------------
- * Earth (static)
+ * Earth (rotating slowly)
  * --------------------------- */
 function Earth({ onHover, onClick }) {
   const earthTex = useMemo(
@@ -182,8 +179,13 @@ function Earth({ onHover, onClick }) {
   const cloudRef = useRef();
   const EARTH_Z = -400;
   const EARTH_R = 200;
-
   const { camera, gl } = useThree();
+
+  // 🌍 Earth + clouds slow rotation
+  useFrame((_, dt) => {
+    if (earthRef.current) earthRef.current.rotation.y += dt * 0.003;
+    if (cloudRef.current) cloudRef.current.rotation.y += dt * 0.004;
+  });
 
   // raycasting for lat/lon
   useEffect(() => {
@@ -342,8 +344,9 @@ export default function CupolaScene() {
               target={[0, 0, -80]}
               enableDamping
               dampingFactor={0.05}
-              enableZoom={false}
-              enablePan={false}
+              minDistance={80}
+              maxDistance={100}
+              zoomSpeed={0.1}
               enableRotate={false}
             />
           )}
