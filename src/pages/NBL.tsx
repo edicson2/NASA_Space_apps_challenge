@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Play, Droplets, Users, Waves, Heart, Cpu } from "lucide-react";
+import { Play, Droplets, Users, Waves, Heart, Cpu, ExternalLink } from "lucide-react";
+import { AspectRatio } from "../components/ui/aspect-ratio";
 
 export function NBL() {
   const [isDragging, setIsDragging] = useState(false);
@@ -99,38 +100,27 @@ export function NBL() {
             <Card className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl">Astronaut Training Video</h2>
-                <Button
-                  size="sm"
-                  className="bg-[#0B3D91] hover:bg-[#0B3D91]/90"
+                <a
+                  href="https://www.youtube.com/watch?v=4514z--Zbfk"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-[#0B3D91] hover:underline"
                 >
-                  <Play className="h-4 w-4 mr-2" />
-                  Watch Full Session
-                </Button>
+                  Watch on YouTube
+                </a>
               </div>
 
-              <div className="aspect-video bg-gradient-to-br from-[#0a4a7a] to-[#0B3D91] rounded-lg flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 opacity-20">
-                  {[...Array(20)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute w-2 h-2 bg-white rounded-full animate-pulse"
-                      style={{
-                        left: `${Math.random() * 100}%`,
-                        top: `${Math.random() * 100}%`,
-                        animationDelay: `${Math.random() * 2}s`,
-                        animationDuration: `${2 + Math.random() * 2}s`,
-                      }}
-                    />
-                  ))}
-                </div>
-                <Button
-                  size="lg"
-                  className="relative z-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm border-2 border-white/40"
-                >
-                  <Play className="h-8 w-8 mr-2" />
-                  Play Training Video
-                </Button>
-              </div>
+              {/* Responsive YouTube embed */}
+              <AspectRatio ratio={16 / 9}>
+                <iframe
+                  src="https://www.youtube.com/embed/4514z--Zbfk?rel=0&modestbranding=1&color=white"
+                  title="Astronaut Training Video"
+                  className="w-full h-full rounded-lg border"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </AspectRatio>
 
               <p className="text-sm text-muted-foreground">
                 Watch astronauts practice spacewalk procedures in the world's
@@ -140,52 +130,37 @@ export function NBL() {
               </p>
             </Card>
 
-            {/* Microgravity Simulation */}
+            
+
+            {/* Inline Weightless Wonders Embed */}
             <Card className="p-6 space-y-4">
-              <h2 className="text-2xl">Interactive Microgravity Simulation</h2>
-              <p className="text-sm text-muted-foreground">
-                Try dragging the astronaut around! In the NBL, divers adjust
-                weights to achieve neutral buoyancy, simulating the weightless
-                environment of space.
-              </p>
-
-              <div
-                className="relative aspect-video bg-gradient-to-br from-[#0a4a7a]/20 to-[#0B3D91]/20 rounded-lg border-2 border-dashed border-border overflow-hidden cursor-move"
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-              >
-                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
-                  Drag the astronaut to simulate movement
-                </div>
-
-                <div
-                  className="absolute w-16 h-16 cursor-grab active:cursor-grabbing transition-transform hover:scale-110"
-                  style={{
-                    left: `${position.x}%`,
-                    top: `${position.y}%`,
-                    transform: "translate(-50%, -50%)",
-                  }}
-                  onMouseDown={handleMouseDown}
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl">Weightless Wonders Game</h2>
+                <a
+                  href={`${import.meta.env.BASE_URL}games/weightless-wonders/index.html`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-[#0B3D91] hover:underline"
                 >
-                  <Users className="w-full h-full text-[#0B3D91] drop-shadow-lg" />
-                </div>
-
-                {/* Floating bubbles effect */}
-                {[...Array(15)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute w-3 h-3 bg-white/30 rounded-full animate-pulse"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      bottom: "-10%",
-                      animation: `float ${
-                        5 + Math.random() * 5
-                      }s infinite ease-in-out`,
-                      animationDelay: `${Math.random() * 3}s`,
-                    }}
+                  Open in new tab <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                <strong>Play directly inside the page. Use W/A/S/D or Arrow keys to move. Press P to pause.</strong>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Weightless Wonders is an immersive educational web game designed to teach players key concepts about gravity and movement in space.
+              </p>
+              {/* Slightly more vertical and horizontal space */}
+              <div className="-mx-4 sm:-mx-6 md:-mx-8">
+                <AspectRatio ratio={5 / 4}>
+                  <iframe
+                    src={`${import.meta.env.BASE_URL}games/weightless-wonders/index.html`}
+                    title="Weightless Wonders Game"
+                    className="w-full h-full rounded-md border"
+                    allow="autoplay; fullscreen"
                   />
-                ))}
+                </AspectRatio>
               </div>
             </Card>
           </div>
