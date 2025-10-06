@@ -74,7 +74,7 @@ export function NBL() {
         </div>
       </div>
 
-  <div className="max-w-7xl mx-auto px-6 -mt-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 -mt-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Video Player */}
           <div className="lg:col-span-2 space-y-6">
@@ -111,32 +111,44 @@ export function NBL() {
               </p>
             </Card>
 
-            
-
             {/* Inline Weightless Wonders Embed */}
             <Card className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl">Weightless Wonders Game</h2>
                 <a
-                  href={`${import.meta.env.BASE_URL}games/weightless-wonders/index.html`}
+                  href={`${
+                    import.meta.env.BASE_URL
+                  }games/weightless-wonders/index.html`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-[#0B3D91] hover:underline"
+                  className="inline-flex items-center gap-2 text-sm text-[#FFF] hover:underline px-2 py-3 bg-[#FF0000]"
+                  style={{
+                    background: "#0B3D91",
+                    padding: 10,
+                    borderRadius: "12px",
+                  }}
                 >
                   Open in new tab <ExternalLink className="h-4 w-4" />
                 </a>
               </div>
               <p className="text-sm text-muted-foreground">
-                <strong>Play directly inside the page. Use W/A/S/D or Arrow keys to move. Press P to pause.</strong>
+                <strong>
+                  Play directly inside the page. Use W/A/S/D or Arrow keys to
+                  move. Press P to pause.
+                </strong>
               </p>
               <p className="text-sm text-muted-foreground">
-                Weightless Wonders is an immersive educational web game designed to teach players key concepts about gravity and movement in space.
+                Weightless Wonders is an immersive educational web game designed
+                to teach players key concepts about gravity and movement in
+                space.
               </p>
               {/* Slightly more vertical and horizontal space */}
               <div className="-mx-4 sm:-mx-6 md:-mx-8">
                 <AspectRatio ratio={5 / 4}>
                   <iframe
-                    src={`${import.meta.env.BASE_URL}games/weightless-wonders/index.html`}
+                    src={`${
+                      import.meta.env.BASE_URL
+                    }games/weightless-wonders/index.html`}
                     title="Weightless Wonders Game"
                     className="w-full h-full rounded-md border"
                     allow="autoplay; fullscreen"
