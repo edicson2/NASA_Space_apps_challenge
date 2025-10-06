@@ -217,8 +217,6 @@ export function NBL() {
             </Card>
           </div>
         </div>
-
-        {/* Earth Benefits Section removed */}
       </div>
     </div>
   );
