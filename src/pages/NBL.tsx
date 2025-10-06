@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Play, Droplets, Users, Waves, Heart, Cpu, ExternalLink } from "lucide-react";
+import { Play, Droplets, Waves, ExternalLink } from "lucide-react";
 import { AspectRatio } from "../components/ui/aspect-ratio";
 
 export function NBL() {
@@ -50,26 +50,7 @@ export function NBL() {
     },
   ];
 
-  const earthBenefits = [
-    {
-      icon: Cpu,
-      title: "Underwater Robotics",
-      description:
-        "NBL-developed technologies advance ROV capabilities for deep-sea exploration and industrial applications.",
-    },
-    {
-      icon: Heart,
-      title: "Medical Simulation",
-      description:
-        "Training techniques from NBL improve surgical procedures and emergency medical response protocols.",
-    },
-    {
-      icon: Users,
-      title: "Team Coordination",
-      description:
-        "Communication strategies developed for astronauts enhance crisis management and team performance.",
-    },
-  ];
+  // Earth benefits section removed per request
 
   return (
     <div className="min-h-screen pt-24 pb-12">
@@ -93,7 +74,7 @@ export function NBL() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 -mt-20 relative z-10">
+  <div className="max-w-7xl mx-auto px-6 -mt-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Video Player */}
           <div className="lg:col-span-2 space-y-6">
@@ -224,33 +205,7 @@ export function NBL() {
           </div>
         </div>
 
-        {/* Earth Benefits Section */}
-        <div className="mt-12 space-y-6">
-          <div className="text-center">
-            <h2 className="text-3xl">How NBL Research Benefits Earth</h2>
-            <p className="text-muted-foreground mt-2">
-              Technologies and techniques developed for astronaut training have
-              far-reaching applications
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {earthBenefits.map((benefit) => (
-              <Card
-                key={benefit.title}
-                className="p-6 space-y-4 hover:shadow-lg transition-shadow"
-              >
-                <div className="w-12 h-12 rounded-lg bg-[#0B3D91]/10 flex items-center justify-center">
-                  <benefit.icon className="h-6 w-6 text-[#0B3D91]" />
-                </div>
-                <h3 className="text-xl">{benefit.title}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {benefit.description}
-                </p>
-              </Card>
-            ))}
-          </div>
-        </div>
+        {/* Earth Benefits Section removed */}
       </div>
     </div>
   );
