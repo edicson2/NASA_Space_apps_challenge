@@ -37,7 +37,7 @@ export default function EnhancedSplashCursorWrapper({
 
     // Sizing with device pixel ratio
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2 for performance
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const width = window.innerWidth;
       const height = window.innerHeight;
 
@@ -51,27 +51,27 @@ export default function EnhancedSplashCursorWrapper({
     resize();
     window.addEventListener("resize", resize);
 
-    // Color palette
+    // NASA Space-themed color palette - subtle yet visible
     const defaultSplash = [
-      "#4a9eff",
-      "#7bb3ff",
-      "#a8d0ff",
-      "#ffffff",
-      "#00d9ff",
+      "#6B9BD1", // Soft space blue
+      "#A8C5E6", // Light stellar blue
+      "#E8F1F8", // Whisper white-blue
+      "#94B8D6", // Calm nebula blue
+      "#7BA8CC", // Gentle cosmic blue
     ];
     const colors =
       Array.isArray(splashColors) && splashColors.length > 0
         ? splashColors
         : defaultSplash;
 
-    // Create splash effect
+    // Create subtle splash effect
     const createSplash = (x: number, y: number) => {
-      const particleCount = 20;
-      const baseSpeed = 4;
+      const particleCount = 12; // Reduced for subtlety
+      const baseSpeed = 2.5; // Slower, gentler movement
 
       for (let i = 0; i < particleCount; i++) {
         const angle = (Math.PI * 2 * i) / particleCount;
-        const speedVariation = 0.5 + Math.random() * 0.5;
+        const speedVariation = 0.6 + Math.random() * 0.4;
         const speed = baseSpeed * speedVariation;
 
         particlesRef.current.push({
@@ -81,7 +81,7 @@ export default function EnhancedSplashCursorWrapper({
           vy: Math.sin(angle) * speed,
           life: 1,
           maxLife: 1,
-          size: Math.random() * 3 + 2,
+          size: Math.random() * 2 + 1.5, // Smaller particles
           color: colors[Math.floor(Math.random() * colors.length)],
         });
       }
@@ -99,42 +99,36 @@ export default function EnhancedSplashCursorWrapper({
     const animate = (currentTime: number) => {
       rafRef.current = requestAnimationFrame(animate);
 
-      // Delta time for frame-rate independent animation
-      const deltaTime = Math.min((currentTime - lastTime) / 16.67, 2); // Cap to prevent large jumps
+      const deltaTime = Math.min((currentTime - lastTime) / 16.67, 2);
       lastTime = currentTime;
 
-      // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const particles = particlesRef.current;
 
-      // Update and draw particles in a single loop
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
 
-        // Physics update with delta time
+        // Smoother physics
         p.x += p.vx * deltaTime;
         p.y += p.vy * deltaTime;
-        p.vx *= 0.98;
-        p.vy *= 0.98;
-        p.vy += 0.05 * deltaTime; // Subtle gravity
-        p.life -= 0.015 * deltaTime;
+        p.vx *= 0.96; // Slightly faster decay for subtlety
+        p.vy *= 0.96;
+        p.vy += 0.03 * deltaTime; // Gentler gravity
+        p.life -= 0.012 * deltaTime; // Slightly longer life
 
-        // Remove dead particles
         if (p.life <= 0) {
           particles.splice(i, 1);
           continue;
         }
 
-        // Calculate opacity with easing
         const lifeFactor = p.life / p.maxLife;
-        const opacity = Math.pow(lifeFactor, 0.8); // Ease out
+        const opacity = Math.pow(lifeFactor, 1.2) * 0.7; // More subtle opacity
 
-        // Draw particle with glow
         const radius = p.size * lifeFactor;
 
-        // Outer glow
-        ctx.shadowBlur = 20 * lifeFactor;
+        // Softer glow
+        ctx.shadowBlur = 12 * lifeFactor;
         ctx.shadowColor = p.color;
 
         // Main particle
@@ -144,24 +138,21 @@ export default function EnhancedSplashCursorWrapper({
         ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        // Inner bright core
+        // Subtle inner core
         ctx.shadowBlur = 0;
-        ctx.globalAlpha = opacity * 0.6;
-        ctx.fillStyle = "#ffffff";
+        ctx.globalAlpha = opacity * 0.4;
+        ctx.fillStyle = "#E8F1F8";
         ctx.beginPath();
-        ctx.arc(p.x, p.y, radius * 0.4, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, radius * 0.3, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Reset context state
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
     };
 
-    // Start animation
     rafRef.current = requestAnimationFrame(animate);
 
-    // Cleanup
     return () => {
       window.removeEventListener("resize", resize);
       window.removeEventListener("click", handleClick);
@@ -174,29 +165,29 @@ export default function EnhancedSplashCursorWrapper({
 
   return (
     <>
-      {/* Fluid cursor trail */}
+      {/* Fluid cursor trail - NASA themed */}
       <div
         style={{
           position: "fixed",
           inset: 0,
           pointerEvents: "none",
           zIndex,
-          isolation: "isolate", // Create stacking context
+          isolation: "isolate",
         }}
       >
         <SplashCursor
-          BACK_COLOR={{ r: 0.04, g: 0.07, b: 0.16 }}
+          BACK_COLOR={{ r: 0.01, g: 0.02, b: 0.05 }} // Deep space black
           COLOR_PALETTE={[
-            { r: 0.3, g: 0.6, b: 1.0 },
-            { r: 0.5, g: 0.8, b: 1.0 },
-            { r: 1.0, g: 1.0, b: 1.0 },
-            { r: 0.0, g: 0.8, b: 1.0 },
+            { r: 0.42, g: 0.61, b: 0.82 }, // NASA blue tones
+            { r: 0.58, g: 0.73, b: 0.85 },
+            { r: 0.51, g: 0.25, b: 0.5 }, // Subtle white
+            { r: 0.48, g: 0.66, b: 0.8 },
           ]}
           TRANSPARENT={true}
-          DENSITY_DISSIPATION={2}
-          VELOCITY_DISSIPATION={1.5}
-          SPLAT_RADIUS={0.15}
-          SPLAT_FORCE={4000}
+          DENSITY_DISSIPATION={3} // Faster dissipation for subtlety
+          VELOCITY_DISSIPATION={2.5} // Smoother trail fade
+          SPLAT_RADIUS={0.12} // Smaller, more controlled
+          SPLAT_FORCE={2500} // Gentler force
         />
       </div>
 

@@ -136,7 +136,7 @@ const EarthScene: React.FC = () => {
             📍 Clicked → Latitude: {coords.lat.toFixed(2)}°, Longitude:{" "}
             {coords.lon.toFixed(2)}°
           </p>
-          <SpyglassMap lat={coords.lat} lon={coords.lon} />
+          <SpyglassMap lat={coords.lat} lon={coords.lon} x={0} y={0} />
         </>
       )}
     </div>

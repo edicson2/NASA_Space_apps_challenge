@@ -5,9 +5,10 @@ import { About } from "./pages/About";
 import { Learn } from "./pages/Learn";
 import { NBL } from "./pages/NBL";
 import { Cupola } from "./pages/Cupola";
-import CupolaViewer from "./pages/CupolaViewer"; // <-- new import
+import CupolaViewer from "./pages/CupolaViewer";
 import { Home } from "./pages/Home";
-// import Home from "./pages/Home";
+import EnhancedSplashCursorWrapper from "./components/EnhancedSplashCursorWrapper";
+import SplashCursorWrapper from "./components/SplashCursorWrapper";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -59,16 +60,18 @@ export default function App() {
 
   return (
     <div className="max-h-full min-h-screen bg-background text-foreground">
-      <Navigation
-        currentPage={currentPage}
-        onNavigate={handleNavigate}
-        theme={theme}
-        onThemeToggle={handleThemeToggle}
-      />
+      <SplashCursorWrapper>
+        <Navigation
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+          theme={theme}
+          onThemeToggle={handleThemeToggle}
+        />
 
-      <main>{renderPage()}</main>
+        <main>{renderPage()}</main>
 
-      <Footer />
+        <Footer />
+      </SplashCursorWrapper>
     </div>
   );
 }

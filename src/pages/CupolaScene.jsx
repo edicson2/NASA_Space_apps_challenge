@@ -26,12 +26,13 @@ function StarfieldBackground() {
         gl_Position = projectionMatrix * viewMatrix * worldPosition;
       }
     `;
+
     const fragment = `
       precision highp float;
       varying vec3 vWorldPosition;
       uniform float uTime;
 
-      float hash(vec3 p) { return fract(sin(dot(p, vec3(127.1,311.7, 74.7))) * 43758.5453123); }
+      float hash(vec3 p) { return fract(sin(dot(p, vec3(127.1,311.7,74.7))) * 43758.5453); }
       float noise(vec3 p){
         vec3 i = floor(p); 
         vec3 f = fract(p);
@@ -43,41 +44,36 @@ function StarfieldBackground() {
         );
         return n;
       }
+
       void main() {
         vec3 dir = normalize(vWorldPosition);
-
-        float density = 150.0;
+        float density = 120.0;
         float n = noise(dir * density);
-        float stars = smoothstep(0.995, 1.0, n);
-
-        float twinkle = 0.5 + 0.5 * sin(uTime + n * 50.0);
-        float brightness = stars * (0.7 + 0.3 * twinkle);
-
-        float glow = pow(noise(dir * 4.0), 3.0) * 0.15;
-
-        vec3 col = vec3(glow) + vec3(brightness);
+        float stars = step(0.92, n);
+        float twinkle = 0.5 + 0.5 * sin(uTime * 2.0 + n * 50.0);
+        vec3 col = vec3(stars * twinkle);
         gl_FragColor = vec4(col, 1.0);
       }
     `;
-    const uniforms = { uTime: { value: 0 } };
+
     return new THREE.ShaderMaterial({
       vertexShader: vertex,
       fragmentShader: fragment,
-      uniforms,
+      uniforms: { uTime: { value: 0 } },
       side: THREE.BackSide,
       depthWrite: false,
-      transparent: true, // ✅ keep stars blending
+      depthTest: false,
     });
   }, []);
 
   useFrame((_, dt) => {
-    if (material) material.uniforms.uTime.value += dt * 0.6;
-    if (meshRef.current) meshRef.current.rotation.y += dt * 0.002;
+    if (material) material.uniforms.uTime.value += dt;
+    if (meshRef.current) meshRef.current.rotation.y += dt * 0.0005;
   });
 
   return (
-    <mesh ref={meshRef} renderOrder={-1}>
-      <sphereGeometry args={[2000, 64, 64]} />
+    <mesh ref={meshRef} renderOrder={-9999}>
+      <sphereGeometry args={[5000, 64, 64]} />
       <primitive object={material} attach="material" />
     </mesh>
   );
@@ -86,17 +82,23 @@ function StarfieldBackground() {
 /** ---------------------------
  * Cupola Model (GLB)
  * --------------------------- */
-const CupolaModel = () => {
+const CupolaModel = ({ microgravity }) => {
   const group = useRef(null);
-
-  // ✅ Vite-safe path
   const gltfPath = `${import.meta.env.BASE_URL}cupola_2/scene.glb`;
   const { scene } = useGLTF(gltfPath);
+  const t = useRef(0);
+
+  // microgravity tilt
+  useFrame((_, dt) => {
+    if (microgravity && group.current) {
+      t.current += dt;
+      group.current.rotation.z = Math.sin(t.current * 0.2) * 0.02;
+    }
+  });
 
   useEffect(() => {
     if (scene && group.current) {
       const modelClone = scene.clone(true);
-
       modelClone.traverse((child) => {
         if (child.isMesh) {
           child.castShadow = true;
@@ -118,8 +120,6 @@ const CupolaModel = () => {
           if (looksLikeGlass) {
             mat.opacity = 0.25;
             mat.depthWrite = false;
-            mat.ior = 1.2;
-            mat.metalness = 0.0;
             mat.roughness = 0.1;
           } else {
             mat.opacity = 1.0;
@@ -130,19 +130,17 @@ const CupolaModel = () => {
         }
       });
 
-      // Clear old model and add new one
       while (group.current.children.length > 0) {
         group.current.remove(group.current.children[0]);
       }
 
-      modelClone.rotation.x = Math.PI;
-      modelClone.scale.setScalar(0.9); // 🔽 10% smaller Cupola
-
+      modelClone.rotation.x = Math.PI / 1.65;
+      modelClone.scale.setScalar(0.9);
       group.current.add(modelClone);
     }
   }, [scene]);
 
-  return <group ref={group} />;
+  return <group ref={group} position={[0, 1, 0]} />;
 };
 
 /** ---------------------------
@@ -152,44 +150,44 @@ function Lights() {
   return (
     <>
       <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[20, 20, 20]}
-        intensity={2.0}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-      />
+      <directionalLight position={[20, 20, 20]} intensity={2.0} castShadow />
       <pointLight position={[-20, -10, -20]} intensity={0.4} />
     </>
   );
 }
 
 /** ---------------------------
- * Earth
- * --------------------------- */
-/** ---------------------------
- * Earth
+ * Earth (rotating slowly)
  * --------------------------- */
 function Earth({ onHover, onClick }) {
-  const earthTex = useMemo(() =>
-    new THREE.TextureLoader().load(`${import.meta.env.BASE_URL}maps/Earth-1440x720.jpg`), []
+  const earthTex = useMemo(
+    () =>
+      new THREE.TextureLoader().load(
+        `${import.meta.env.BASE_URL}maps/Earth-1440x720.jpg`
+      ),
+    []
   );
-  const cloudsTex = useMemo(() =>
-    new THREE.TextureLoader().load(`${import.meta.env.BASE_URL}maps/flat_earth_still_clouds.jpg`), []
+  const cloudsTex = useMemo(
+    () =>
+      new THREE.TextureLoader().load(
+        `${import.meta.env.BASE_URL}maps/flat_earth_still_clouds.jpg`
+      ),
+    []
   );
 
   const earthRef = useRef();
   const cloudRef = useRef();
   const EARTH_Z = -400;
   const EARTH_R = 200;
-
   const { camera, gl } = useThree();
 
+  // 🌍 Earth + clouds slow rotation
   useFrame((_, dt) => {
-    if (earthRef.current) earthRef.current.rotation.y += dt * 0.01;
-    if (cloudRef.current) cloudRef.current.rotation.y += dt * 0.015;
+    if (earthRef.current) earthRef.current.rotation.y += dt * 0.003;
+    if (cloudRef.current) cloudRef.current.rotation.y += dt * 0.004;
   });
 
+  // raycasting for lat/lon
   useEffect(() => {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -203,10 +201,13 @@ function Earth({ onHover, onClick }) {
         earthRef.current.updateMatrixWorld(true);
         const intersects = raycaster.intersectObject(earthRef.current, true);
         if (intersects.length > 0) {
-          const p = intersects[0].point.clone().sub(new THREE.Vector3(0, 0, EARTH_Z)).normalize();
+          const p = intersects[0].point
+            .clone()
+            .sub(new THREE.Vector3(0, 0, EARTH_Z))
+            .normalize();
           const lat = Math.asin(p.y) * (180 / Math.PI);
           const lon = Math.atan2(p.z, p.x) * (180 / Math.PI);
-          onHover({
+          onHover?.({
             lat: lat.toFixed(2),
             lon: lon.toFixed(2),
             x: event.clientX,
@@ -227,10 +228,18 @@ function Earth({ onHover, onClick }) {
         earthRef.current.updateMatrixWorld(true);
         const intersects = raycaster.intersectObject(earthRef.current, true);
         if (intersects.length > 0) {
-          const p = intersects[0].point.clone().sub(new THREE.Vector3(0, 0, EARTH_Z)).normalize();
+          const p = intersects[0].point
+            .clone()
+            .sub(new THREE.Vector3(0, 0, EARTH_Z))
+            .normalize();
           const lat = Math.asin(p.y) * (180 / Math.PI);
           const lon = Math.atan2(p.z, p.x) * (180 / Math.PI);
-          onClick({ lat: lat.toFixed(2), lon: lon.toFixed(2), x: event.clientX, y: event.clientY });
+          onClick?.({
+            lat: lat.toFixed(2),
+            lon: lon.toFixed(2),
+            x: event.clientX,
+            y: event.clientY,
+          });
         }
       }
     };
@@ -250,7 +259,6 @@ function Earth({ onHover, onClick }) {
         <sphereGeometry args={[EARTH_R, 128, 128]} />
         <meshStandardMaterial map={earthTex} />
       </mesh>
-
       <mesh ref={cloudRef} position={[0, 0, EARTH_Z]}>
         <sphereGeometry args={[EARTH_R + 0.6, 128, 128]} />
         <meshPhongMaterial
@@ -284,8 +292,7 @@ function Tooltip({ coords }) {
         zIndex: 1000,
       }}
     >
-      Lat: {coords.lat}° <br />
-      Lon: {coords.lon}°
+      Lat: {coords.lat}° <br /> Lon: {coords.lon}°
     </div>
   );
 }
@@ -295,13 +302,14 @@ function Tooltip({ coords }) {
  * --------------------------- */
 export default function CupolaScene() {
   const [coords, setCoords] = useState(null);
-  const [spyglassCoords, setSpyglassCoords] = useState(null); // ✅ store click
-
+  const [spyglassCoords, setSpyglassCoords] = useState(null);
   const [fpMode, setFpMode] = useState(false);
+  const [microgravity, setMicrogravity] = useState(true);
 
   useEffect(() => {
     const handler = (e) => {
       if (e.code === "KeyE") setFpMode((prev) => !prev);
+      if (e.code === "KeyM") setMicrogravity((prev) => !prev);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -315,16 +323,33 @@ export default function CupolaScene() {
         gl={{
           antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          outputEncoding: THREE.sRGBEncoding,
         }}
         dpr={[1, 2]}
       >
-        <Suspense fallback={<Html center><div style={{ color: "white" }}>Loading Cupola…</div></Html>}>
+        <Suspense
+          fallback={
+            <Html center>
+              <div style={{ color: "white" }}>Loading Cupola…</div>
+            </Html>
+          }
+        >
           <StarfieldBackground />
           <Lights />
-          <Earth onHover={setCoords} onClick={setSpyglassCoords} /> {/* ✅ */}
-          <CupolaModel />
-          {fpMode ? <PointerLockControls /> : <OrbitControls target={[0, 0, -80]} enableDamping dampingFactor={0.05} enableZoom={false} />}
+          <Earth onHover={setCoords} onClick={setSpyglassCoords} />
+          <CupolaModel microgravity={microgravity} />
+          {fpMode ? (
+            <PointerLockControls />
+          ) : (
+            <OrbitControls
+              target={[0, 0, -80]}
+              enableDamping
+              dampingFactor={0.05}
+              minDistance={80}
+              maxDistance={100}
+              zoomSpeed={0.1}
+              enableRotate={false}
+            />
+          )}
         </Suspense>
       </Canvas>
 
@@ -332,19 +357,39 @@ export default function CupolaScene() {
 
       {/* Spyglass overlay */}
       {spyglassCoords && (
-  <SpyglassMap
-    lat={parseFloat(spyglassCoords.lat)}
-    lon={parseFloat(spyglassCoords.lon)}
-    x={spyglassCoords.x}
-    y={spyglassCoords.y}
-  />
-)}
+        <SpyglassMap
+          lat={parseFloat(spyglassCoords.lat)}
+          lon={parseFloat(spyglassCoords.lon)}
+          x={spyglassCoords.x}
+          y={spyglassCoords.y}
+        />
+      )}
 
-
+      {/* HUD Overlay */}
+      <div
+        style={{
+          position: "absolute",
+          top: "20px",
+          left: "20px",
+          background: "rgba(0,0,0,0.5)",
+          color: "white",
+          padding: "6px 12px",
+          borderRadius: "8px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 2000,
+        }}
+      >
+        Microgravity:{" "}
+        <span style={{ color: microgravity ? "#4ade80" : "#f87171" }}>
+          {microgravity ? "ON" : "OFF"}
+        </span>
+        <br />
+        <small style={{ opacity: 0.7 }}>(Press M to toggle)</small>
+      </div>
     </>
   );
 }
-
 
 // ✅ Preload with Vite-safe path
 useGLTF.preload(`${import.meta.env.BASE_URL}cupola_2/scene.glb`);
