@@ -76,12 +76,12 @@ export function Navigation({
           }}
           onMouseLeave={() => setIsHovering(false)}
         >
-          <button
+          {/* <button
             className={styles.menuButton}
             onClick={() => setIsExpanded(true)}
           >
             <Menu className="w-7 h-7 text-white drop-shadow-lg" />
-          </button>
+          </button> */}
         </div>
       )}
 
@@ -111,7 +111,7 @@ export function Navigation({
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
                 <img
-                  src="/nasa/NASA_logo.png"
+                  src="/public/nasa/NASA_logo.png"
                   alt="NASA Logo"
                   className="w-10 h-10 object-cover rounded-full"
                 />
@@ -142,7 +142,7 @@ export function Navigation({
               {/* Right Controls */}
               <div className={styles.rightControls}>
                 <img
-                  src="/nasa/spaceAppLogo.png"
+                  src="/public/nasa/spaceAppLogo.png"
                   alt="Space App Logo"
                   className="h-10 w-auto object-contain"
                 />
